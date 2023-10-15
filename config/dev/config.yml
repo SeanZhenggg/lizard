@@ -1,0 +1,4 @@
+log:
+  name: "lizard"
+  env: "dev"
+  level: "debug"

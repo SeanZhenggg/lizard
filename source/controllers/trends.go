@@ -1,16 +1,27 @@
 package controllers
 
-import "lizard/source/mongo"
+import (
+	"github.com/gin-gonic/gin"
+	"lizard/source/mongo"
+	"lizard/source/service"
+)
 
 type ITrendCtrl interface {
+	GetTrends(ctx *gin.Context)
 }
 
-func ProviderITrendsCtrl(db mongo.IMongoCli) ITrendCtrl {
+func ProviderITrendsCtrl(trendSrv service.ITrendSrv, db mongo.IMongoCli) ITrendCtrl {
 	return &trendCtrl{
-		db: db,
+		db:       db,
+		trendSrv: trendSrv,
 	}
 }
 
 type trendCtrl struct {
-	db mongo.IMongoCli
+	db       mongo.IMongoCli
+	trendSrv service.ITrendSrv
+}
+
+func (t *trendCtrl) GetTrends(ctx *gin.Context) {
+	t.trendSrv.GetTrends(ctx)
 }

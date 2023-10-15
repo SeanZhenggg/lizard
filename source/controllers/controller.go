@@ -7,12 +7,12 @@ import (
 
 func ProvideController(trendCtrl ITrendCtrl) *Controller {
 	return &Controller{
-		trendCtrl: trendCtrl,
+		TrendCtrl: trendCtrl,
 	}
 }
 
 type Controller struct {
-	trendCtrl ITrendCtrl
+	TrendCtrl ITrendCtrl
 }
 
 type StandardResponse struct{}
