@@ -1,67 +1,57 @@
 package config
 
 import (
-	"fmt"
-	"github.com/SeanZhenggg/go-utils/logger"
 	"github.com/spf13/viper"
+	"log"
 	"os"
 	"path/filepath"
 )
 
 type IConfigEnv interface {
-	logger.ILogConfig
+	GetLogConfig() logConfig
 }
 
-func ProviderIConfigEnv() logger.ILogConfig {
-	ex, err := os.Executable()
+func ProviderIConfigEnv() IConfigEnv {
+	exePath, err := os.Executable()
 	if err != nil {
-		panic(err)
+		log.Fatalf("🔔🔔🔔 fatal error os.Executable: %v 🔔🔔🔔", err)
 	}
 
-	// 获取可执行文件所在目录
-	exPath := filepath.Dir(ex)
+	// 获取可执行文件所在目录的路径
+	exeDir := filepath.Dir(exePath)
 
-	// 获取项目根目录（假设根目录为 src 的上一级）
-	projectRoot := filepath.Dir(exPath)
+	// 获取项目根目录的路径（假设项目根目录就在可执行文件所在的目录下）
+	projectRoot := filepath.Dir(exeDir)
 
-	// 打印项目根目录
-	//println("Project Root:", projectRoot)
-
-	viper.SetConfigFile("config.yaml")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
 	viper.AddConfigPath(projectRoot)
 
 	// 读取配置文件
-	err = viper.ReadInConfig()
-	if err != nil {
-		panic(fmt.Errorf("fatal error config file: %w", err))
+	if err = viper.ReadInConfig(); err != nil {
+		log.Fatalf("🔔🔔🔔 fatal error viper.ReadInConfig: %v 🔔🔔🔔", err)
 	}
 
 	// 将配置映射到结构体
-	var config ConfigEnv
+	var config configEnv
 	err = viper.Unmarshal(&config)
 	if err != nil {
-		panic(fmt.Errorf("unable to decode into struct：%s", err))
+		log.Fatalf("🔔🔔🔔 fatal error viper.Unmarshal: %v 🔔🔔🔔", err)
 	}
 
 	return &config
 }
 
-type ConfigEnv struct {
-	LogConfig LogConfig
+type configEnv struct {
+	LogConfig logConfig
 }
 
-type LogConfig struct {
+type logConfig struct {
 	Name  string `mapstructure:"name"`
 	Env   string `mapstructure:"env"`
 	Level string `mapstructure:"level"`
 }
 
-func (c ConfigEnv) GetLogConfig() logger.LogConfig {
-	return logger.LogConfig{
-		Name:  c.LogConfig.Name,
-		Env:   c.LogConfig.Env,
-		Level: c.LogConfig.Level,
-	}
+func (c *configEnv) GetLogConfig() logConfig {
+	return c.LogConfig
 }

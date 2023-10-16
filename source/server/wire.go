@@ -18,7 +18,8 @@ func NewAppServer() *appServer {
 	panic(
 		wire.Build(
 			config.ProviderIConfigEnv,
-			logUtils.ProviderLogger,
+			config.ProviderILogConfig,
+			logUtils.ProviderILogger,
 			middleware.ProvideResponseMiddleware,
 			middleware.ProvideAuthMiddleware,
 			service.ProviderITrendsSrv,

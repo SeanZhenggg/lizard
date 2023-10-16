@@ -1,7 +1,7 @@
 module lizard
 
 require (
-	github.com/SeanZhenggg/go-utils v0.0.0-20231015170630-79e768a2b1e5
+	github.com/SeanZhenggg/go-utils v0.0.0-20231016014241-37eb939c1e5f
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/wire v0.5.0
 	go.mongodb.org/mongo-driver v1.9.1
