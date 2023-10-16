@@ -2,8 +2,10 @@ package mongo
 
 import (
 	"context"
+	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"lizard/source/config"
 	"log"
 )
 
@@ -12,18 +14,22 @@ type IMongoCli interface {
 }
 
 type mongoDB struct {
-	DB *mongo.Database
+	DB       *mongo.Database
+	DbConfig config.DbConfig
 }
 
-func ProvideMongoDbCli() IMongoCli {
-	newDB := &mongoDB{}
-	newDB.DB = mongoDbConnect()
+func ProvideMongoDbCli(config config.IConfigEnv) IMongoCli {
+	dbCfg := config.GetDbConfig()
+	newDB := &mongoDB{
+		DbConfig: dbCfg,
+		DB:       dbConnect(dbCfg),
+	}
 
 	return newDB
 }
 
-func mongoDbConnect() *mongo.Database {
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+func dbConnect(dbConfig config.DbConfig) *mongo.Database {
+	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%s", dbConfig.Host, dbConfig.Port))
 
 	// 建立连接
 	client, err := mongo.Connect(context.Background(), clientOptions)

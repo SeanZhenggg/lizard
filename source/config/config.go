@@ -9,6 +9,7 @@ import (
 
 type IConfigEnv interface {
 	GetLogConfig() logConfig
+	GetDbConfig() DbConfig
 }
 
 func ProviderIConfigEnv() IConfigEnv {
@@ -44,6 +45,7 @@ func ProviderIConfigEnv() IConfigEnv {
 
 type configEnv struct {
 	LogConfig logConfig
+	DbConfig  DbConfig
 }
 
 type logConfig struct {
@@ -52,6 +54,16 @@ type logConfig struct {
 	Level string `mapstructure:"level"`
 }
 
+type DbConfig struct {
+	Host   string `mapstructure:"host"`
+	Port   string `mapstructure:"port"`
+	DbName string `mapstructure:"dbName"`
+}
+
 func (c *configEnv) GetLogConfig() logConfig {
 	return c.LogConfig
+}
+
+func (c *configEnv) GetDbConfig() DbConfig {
+	return c.DbConfig
 }

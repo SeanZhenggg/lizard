@@ -2,3 +2,7 @@ log:
   name: "lizard"
   env: "dev"
   level: "debug"
+mongodb:
+  host: "localhost"
+  port: "27017"
+  dbName: "lizard"
