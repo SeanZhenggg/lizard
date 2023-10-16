@@ -33,13 +33,13 @@ func ProviderIConfigEnv() IConfigEnv {
 	}
 
 	// 将配置映射到结构体
-	var config configEnv
-	err = viper.Unmarshal(&config)
+	var cfg configEnv
+	err = viper.Unmarshal(&cfg)
 	if err != nil {
 		log.Fatalf("🔔🔔🔔 fatal error viper.Unmarshal: %v 🔔🔔🔔", err)
 	}
 
-	return &config
+	return &cfg
 }
 
 type configEnv struct {
