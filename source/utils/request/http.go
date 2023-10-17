@@ -26,6 +26,11 @@ func NewClient(logger logger.ILogger) *HttpClient {
 	}
 }
 
+func (c *HttpClient) HttpGet(url string, query map[string]string, headers map[string]string) ([]byte, error) {
+	_url := fmt.Sprintf("%s?%s", url, queryMapEncode(query))
+	return c.DoRequest(http.MethodGet, _url, nil, headers)
+}
+
 func (c *HttpClient) DoRequest(method string, url string, body []byte, headers map[string]string) ([]byte, error) {
 	c.client = &http.Client{
 		Timeout: c.timeout,
@@ -44,6 +49,10 @@ func (c *HttpClient) DoRequest(method string, url string, body []byte, headers m
 		return nil, err
 	}
 
+	//req.Header.Set("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
+	//req.Header.Set("Accept", "application/json; charset=UTF-8")
+	//req.Header.Set("Accept-Encoding", "utf-8")
+
 	for k, v := range headers {
 		req.Header.Set(k, v)
 	}
@@ -55,17 +64,13 @@ func (c *HttpClient) DoRequest(method string, url string, body []byte, headers m
 	}
 
 	readRes, err := io.ReadAll(res.Body)
+
 	if err != nil {
 		c.logger.Error(xerrors.Errorf("http DoRequest read response error: %w", err))
 		return nil, err
 	}
 
 	return readRes, nil
-}
-
-func (c *HttpClient) HttpGet(url string, query map[string]string, headers map[string]string) ([]byte, error) {
-	_url := fmt.Sprintf("%s?%s", url, queryMapEncode(query))
-	return c.DoRequest(http.MethodGet, _url, nil, headers)
 }
 
 func queryMapEncode(qm QueryMap) string {

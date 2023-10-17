@@ -7,12 +7,12 @@ type DailyTrends struct {
 }
 
 type Default struct {
-	TrendingSearchesDays  TrendingSearchesDays `json:"trendingSearchesDays"`
-	EndDateForNextRequest string               `json:"endDateForNextRequest"`
-	RssFeedPageUrl        string               `json:"rssFeedPageUrl"`
+	TrendingSearchesDays  []TrendingSearchesDay `json:"trendingSearchesDays"`
+	EndDateForNextRequest string                `json:"endDateForNextRequest"`
+	RssFeedPageUrl        string                `json:"rssFeedPageUrl"`
 }
 
-type TrendingSearchesDays struct {
+type TrendingSearchesDay struct {
 	Date             string  `json:"date"`
 	FormattedDate    string  `json:"formattedDate"`
 	TrendingSearches []Trend `json:"trendingSearches"`
@@ -22,7 +22,7 @@ type Trend struct {
 	ID               primitive.ObjectID `json:"id"`
 	Title            Title              `json:"title"`
 	FormattedTraffic string             `json:"formattedTraffic"`
-	RelatedQueries   []string           `json:"relatedQueries"`
+	RelatedQueries   []Title            `json:"relatedQueries"`
 	Image            Image              `json:"image"`
 	Articles         []Article          `json:"articles"`
 	ShareUrl         string             `json:"shareUrl"`

@@ -1,10 +1,10 @@
 package config
 
 import (
+	"fmt"
 	"github.com/spf13/viper"
 	"log"
 	"os"
-	"path/filepath"
 )
 
 type IConfigEnv interface {
@@ -13,39 +13,35 @@ type IConfigEnv interface {
 }
 
 func ProviderIConfigEnv() IConfigEnv {
-	exePath, err := os.Executable()
-	if err != nil {
-		log.Fatalf("🔔🔔🔔 fatal error os.Executable: %v 🔔🔔🔔", err)
+	appEnv := os.Getenv("APP_ENV")
+	if appEnv == "" {
+		log.Fatalf("🔔🔔🔔 fatal error : APP_ENV required 🔔🔔🔔")
 	}
 
-	// 获取可执行文件所在目录的路径
-	exeDir := filepath.Dir(exePath)
+	log.Printf("appEnv : %v, path: %s", appEnv, fmt.Sprintf("./config/%s", appEnv))
 
-	// 获取项目根目录的路径（假设项目根目录就在可执行文件所在的目录下）
-	projectRoot := filepath.Dir(exeDir)
-
+	viper.AddConfigPath(fmt.Sprintf("./config/%s/", appEnv))
+	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
-	viper.AddConfigPath(projectRoot)
 
 	// 读取配置文件
-	if err = viper.ReadInConfig(); err != nil {
+	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("🔔🔔🔔 fatal error viper.ReadInConfig: %v 🔔🔔🔔", err)
 	}
-
+	log.Printf("%v", viper.Get("log"))
 	// 将配置映射到结构体
 	var cfg configEnv
-	err = viper.Unmarshal(&cfg)
-	if err != nil {
+	if err := viper.Unmarshal(&cfg); err != nil {
 		log.Fatalf("🔔🔔🔔 fatal error viper.Unmarshal: %v 🔔🔔🔔", err)
 	}
+	log.Printf("cfg: %v", cfg)
 
 	return &cfg
 }
 
 type configEnv struct {
-	LogConfig logConfig
-	DbConfig  DbConfig
+	LogConfig logConfig `mapstructure:"log"`
+	DbConfig  DbConfig  `mapstructure:"mongodb"`
 }
 
 type logConfig struct {

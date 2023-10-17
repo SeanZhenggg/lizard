@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/writeconcern"
 	"lizard/source/config"
 	"log"
 )
@@ -20,6 +21,7 @@ type mongoDB struct {
 
 func ProvideMongoDbCli(config config.IConfigEnv) IMongoCli {
 	dbCfg := config.GetDbConfig()
+	log.Printf("dbCfg : %v", dbCfg)
 	newDB := &mongoDB{
 		DbConfig: dbCfg,
 		DB:       dbConnect(dbCfg),
@@ -29,7 +31,23 @@ func ProvideMongoDbCli(config config.IConfigEnv) IMongoCli {
 }
 
 func dbConnect(dbConfig config.DbConfig) *mongo.Database {
-	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%s", dbConfig.Host, dbConfig.Port))
+	credential := options.Credential{
+		Username: "root",
+		Password: "mongopw",
+	}
+	log.Printf("Connecting to %s", fmt.Sprintf(
+		"mongodb://%s:%s",
+		dbConfig.Host,
+		dbConfig.Port,
+	))
+	clientOptions := options.Client().ApplyURI(fmt.Sprintf(
+		"mongodb://%s:%s",
+		dbConfig.Host,
+		dbConfig.Port,
+	)).
+		SetAuth(credential).
+		SetMaxPoolSize(20).
+		SetWriteConcern(writeconcern.New(writeconcern.WMajority()))
 
 	// 建立连接
 	client, err := mongo.Connect(context.Background(), clientOptions)
@@ -43,7 +61,7 @@ func dbConnect(dbConfig config.DbConfig) *mongo.Database {
 		log.Fatal("🔔🔔🔔 MONGODB CONNECT ERROR: ", err.Error(), " 🔔🔔🔔")
 	}
 
-	return client.Database("lizard")
+	return client.Database(dbConfig.DbName)
 }
 
 func (m *mongoDB) GetCollection(ctx context.Context, name string) ICollection {

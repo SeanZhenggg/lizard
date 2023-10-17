@@ -4,7 +4,9 @@ require (
 	github.com/SeanZhenggg/go-utils v0.0.0-20231016014241-37eb939c1e5f
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/wire v0.5.0
+	github.com/spf13/viper v1.17.0
 	go.mongodb.org/mongo-driver v1.9.1
+	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 )
 
 require (
@@ -37,7 +39,6 @@ require (
 	github.com/spf13/afero v1.10.0 // indirect
 	github.com/spf13/cast v1.5.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/spf13/viper v1.17.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
@@ -54,9 +55,7 @@ require (
 	golang.org/x/sync v0.3.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
-	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
-	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

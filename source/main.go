@@ -1,9 +1,10 @@
 package main
 
-import (
-	"fmt"
-)
+import "lizard/source/server"
 
 func main() {
-	fmt.Println("hello world!")
+
+	appServer := server.NewAppServer()
+	appServer.Init()
+	appServer.Run()
 }

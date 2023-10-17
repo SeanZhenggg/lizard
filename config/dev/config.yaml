@@ -4,5 +4,5 @@ log:
   level: "debug"
 mongodb:
   host: "localhost"
-  port: "27017"
+  port: 27017
   dbName: "lizard"

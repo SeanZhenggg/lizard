@@ -8,11 +8,11 @@ import (
 	"golang.org/x/xerrors"
 	"lizard/source/model/bo"
 	"lizard/source/utils/request"
-	"net/http"
+	"regexp"
 )
 
 type ITrendSrv interface {
-	GetTrends(ctx context.Context)
+	GetTrends(ctx context.Context) (*bo.DailyTrends, error)
 }
 
 func ProviderITrendsSrv(logger logger.ILogger) ITrendSrv {
@@ -25,25 +25,33 @@ type trendSrv struct {
 	logger logger.ILogger
 }
 
-func (t *trendSrv) GetTrends(ctx context.Context) {
+func (t *trendSrv) GetTrends(ctx context.Context) (*bo.DailyTrends, error) {
 	client := request.NewClient(t.logger)
 
-	response, err := client.HttpGet(http.MethodGet, map[string]string{
+	response, err := client.HttpGet("https://trends.google.com/trends/api/dailytrends", map[string]string{
 		"hl":  "zh-TW",
 		"tz":  "-480",
 		"geo": "TW",
 		"ns":  "15",
 	}, nil)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	trend := &bo.DailyTrends{}
+	re, err := regexp.Compile(`{"default":{(.*?)}}`)
+	if err != nil {
+		return nil, err
+	}
 
-	if err := json.Unmarshal(response, trend); err != nil {
+	matched := re.FindString(string(response))
+
+	trend := &bo.DailyTrends{}
+	if err := json.Unmarshal([]byte(matched), trend); err != nil {
 		t.logger.Error(xerrors.Errorf("service GetTrends json unmarshal error: %w", err))
-		return
+		return nil, err
 	}
 
 	t.logger.Info(fmt.Sprintf("response trends : %v", trend))
+
+	return trend, nil
 }
