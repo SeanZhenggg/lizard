@@ -1,31 +1,28 @@
 package bo
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
-
 type DailyTrends struct {
-	Default Default `json:"default"`
+	Default *Default `json:"default"`
 }
 
 type Default struct {
-	TrendingSearchesDays  []TrendingSearchesDay `json:"trendingSearchesDays"`
-	EndDateForNextRequest string                `json:"endDateForNextRequest"`
-	RssFeedPageUrl        string                `json:"rssFeedPageUrl"`
+	TrendingSearchesDays  []*TrendingSearchesDay `json:"trendingSearchesDays"`
+	EndDateForNextRequest string                 `json:"endDateForNextRequest"`
+	RssFeedPageUrl        string                 `json:"rssFeedPageUrl"`
 }
 
 type TrendingSearchesDay struct {
-	Date             string  `json:"date"`
-	FormattedDate    string  `json:"formattedDate"`
-	TrendingSearches []Trend `json:"trendingSearches"`
+	Date             string   `json:"date"`
+	FormattedDate    string   `json:"formattedDate"`
+	TrendingSearches []*Trend `json:"trendingSearches"`
 }
 
 type Trend struct {
-	ID               primitive.ObjectID `json:"id"`
-	Title            Title              `json:"title"`
-	FormattedTraffic string             `json:"formattedTraffic"`
-	RelatedQueries   []Title            `json:"relatedQueries"`
-	Image            Image              `json:"image"`
-	Articles         []Article          `json:"articles"`
-	ShareUrl         string             `json:"shareUrl"`
+	Title            *Title     `json:"title"`
+	FormattedTraffic string     `json:"formattedTraffic"`
+	RelatedQueries   []*Title   `json:"relatedQueries"`
+	Image            *Image     `json:"image"`
+	Articles         []*Article `json:"articles"`
+	ShareUrl         string     `json:"shareUrl"`
 }
 
 type Title struct {
@@ -43,7 +40,7 @@ type Article struct {
 	Title   string `json:"title"`
 	TimeAgo string `json:"timeAgo"`
 	Source  string `json:"source"`
-	Image   Image  `json:"image"`
+	Image   *Image `json:"image"`
 	Url     string `json:"url"`
 	Snippet string `json:"snippet"`
 }

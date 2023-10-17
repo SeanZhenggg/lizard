@@ -11,6 +11,7 @@ import (
 	"lizard/source/controllers"
 	"lizard/source/controllers/middleware"
 	"lizard/source/mongo"
+	"lizard/source/repository"
 	"lizard/source/service"
 )
 
@@ -20,6 +21,7 @@ func NewAppServer() *appServer {
 			config.ProviderIConfigEnv,
 			config.ProviderILogConfig,
 			logUtils.ProviderILogger,
+			repository.ProvideTrendRepository,
 			middleware.ProvideResponseMiddleware,
 			middleware.ProvideAuthMiddleware,
 			service.ProviderITrendsSrv,

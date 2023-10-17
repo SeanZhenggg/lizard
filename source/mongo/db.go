@@ -11,7 +11,7 @@ import (
 )
 
 type IMongoCli interface {
-	GetCollection(ctx context.Context, name string) ICollection
+	GetCollection(ctx context.Context, name string) *mongo.Collection
 }
 
 type mongoDB struct {
@@ -64,10 +64,10 @@ func dbConnect(dbConfig config.DbConfig) *mongo.Database {
 	return client.Database(dbConfig.DbName)
 }
 
-func (m *mongoDB) GetCollection(ctx context.Context, name string) ICollection {
-	c := &Collection{
-		m.DB.Collection(name),
-	}
+func (m *mongoDB) GetCollection(ctx context.Context, name string) *mongo.Collection {
+	//c := &Collection{
+	//	m.DB.Collection(name),
+	//}
 
-	return c
+	return m.DB.Collection(name)
 }

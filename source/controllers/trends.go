@@ -2,26 +2,31 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"lizard/source/mongo"
 	"lizard/source/service"
+	"net/http"
 )
 
 type ITrendCtrl interface {
-	GetTrends(ctx *gin.Context)
+	FetchTrends(ctx *gin.Context)
 }
 
-func ProviderITrendsCtrl(trendSrv service.ITrendSrv, db mongo.IMongoCli) ITrendCtrl {
+func ProviderITrendsCtrl(trendSrv service.ITrendSrv) ITrendCtrl {
 	return &trendCtrl{
-		db:       db,
 		trendSrv: trendSrv,
 	}
 }
 
 type trendCtrl struct {
-	db       mongo.IMongoCli
-	trendSrv service.ITrendSrv
+	trendSrv    service.ITrendSrv
+	SetResponse *StandardResponse
 }
 
-func (t *trendCtrl) GetTrends(ctx *gin.Context) {
-	t.trendSrv.GetTrends(ctx)
+func (t *trendCtrl) FetchTrends(ctx *gin.Context) {
+	err := t.trendSrv.FetchTrends(ctx)
+	if err != nil {
+		t.SetResponse.SetStandardResponse(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	t.SetResponse.SetStandardResponse(ctx, http.StatusOK, "ok")
 }
