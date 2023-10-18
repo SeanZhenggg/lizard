@@ -19,7 +19,8 @@ func NewAppServer() *appServer {
 	panic(
 		wire.Build(
 			config.ProviderIConfigEnv,
-			config.ProviderILogConfig,
+			// 沒有這個的話 ProviderILogger 在 wire gen 會報錯
+			//config.ProviderILogConfig,
 			logUtils.ProviderILogger,
 			repository.ProvideTrendRepository,
 			middleware.ProvideResponseMiddleware,

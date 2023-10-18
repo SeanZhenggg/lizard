@@ -2,13 +2,15 @@ package config
 
 import (
 	"fmt"
+	"github.com/SeanZhenggg/go-utils/logger"
 	"github.com/spf13/viper"
 	"log"
 	"os"
 )
 
 type IConfigEnv interface {
-	GetLogConfig() logConfig
+	//GetLogConfig() logConfig
+	GetLogConfig() logger.LogConfig
 	GetDbConfig() DbConfig
 }
 
@@ -56,8 +58,11 @@ type DbConfig struct {
 	DbName string `mapstructure:"dbName"`
 }
 
-func (c *configEnv) GetLogConfig() logConfig {
-	return c.LogConfig
+//	func (c *configEnv) GetLogConfig() logConfig {
+//		return c.LogConfig
+//	}
+func (c *configEnv) GetLogConfig() logger.LogConfig {
+	return logger.LogConfig(c.LogConfig)
 }
 
 func (c *configEnv) GetDbConfig() DbConfig {
