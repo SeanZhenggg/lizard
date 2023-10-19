@@ -8,8 +8,8 @@ import (
 	"github.com/google/wire"
 	"lizard/source/app/web"
 	"lizard/source/config"
-	"lizard/source/controllers"
-	"lizard/source/controllers/middleware"
+	web2 "lizard/source/controllers/web"
+	middleware2 "lizard/source/controllers/web/middleware"
 	"lizard/source/mongo"
 	"lizard/source/repository"
 	"lizard/source/service"
@@ -22,11 +22,11 @@ func NewAppServer() *appServer {
 			config.ProviderILogConfig,
 			logUtils.ProviderILogger,
 			repository.ProvideTrendRepository,
-			middleware.ProvideResponseMiddleware,
-			middleware.ProvideAuthMiddleware,
+			middleware2.ProvideResponseMiddleware,
+			middleware2.ProvideAuthMiddleware,
 			service.ProviderITrendsSrv,
-			controllers.ProviderITrendsCtrl,
-			controllers.ProvideController,
+			web2.ProviderITrendsCtrl,
+			web2.ProvideController,
 			mongo.ProvideMongoDbCli,
 			web.ProvideWebApp,
 			wire.Struct(new(appServer), "*"),

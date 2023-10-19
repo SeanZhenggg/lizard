@@ -41,27 +41,23 @@ func (t *trendSrv) FetchTrends(ctx context.Context) error {
 		"ns":  "15",
 	}, nil)
 	if err != nil {
-		t.logger.Error(xerrors.Errorf("trendsSrv FetchTrends client.HttpGet error: %w", err))
-		return err
+		return xerrors.Errorf("trendsSrv FetchTrends client.HttpGet error: %w", err)
 	}
 
 	re, err := regexp.Compile(`{"default":{(.*?)}}`)
 	if err != nil {
-		t.logger.Error(xerrors.Errorf("trendsSrv FetchTrends regexp.Compile error: %w", err))
-		return err
+		return xerrors.Errorf("trendsSrv FetchTrends regexp.Compile error: %w", err)
 	}
 
 	matched := re.FindString(string(response))
 
 	trend := &bo.DailyTrends{}
 	if err := json.Unmarshal([]byte(matched), trend); err != nil {
-		t.logger.Error(xerrors.Errorf("trendsSrv FetchTrends json unmarshal error: %w", err))
-		return err
+		return xerrors.Errorf("trendsSrv FetchTrends json unmarshal error: %w", err)
 	}
 
 	if trend.Default == nil {
-		t.logger.Error(xerrors.Errorf("trendsSrv fetch error: trend.Default is nil"))
-		return err
+		return xerrors.Errorf("trendsSrv fetch error: trend.Default is nil")
 	}
 
 	var testFlag bool
@@ -99,8 +95,7 @@ func (t *trendSrv) FetchTrends(ctx context.Context) error {
 	db := t.db.GetCollection(ctx, "trends")
 	err = t.repo.BatchInsert(ctx, db, poTrends)
 	if err != nil {
-		t.logger.Error(xerrors.Errorf("trendsSrv FetchTrends regexp.Compile error: %w", err))
-		return err
+		return xerrors.Errorf("trendsSrv FetchTrends t.repo.BatchInsert error: %w", err)
 	}
 
 	return nil
