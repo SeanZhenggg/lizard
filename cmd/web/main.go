@@ -5,7 +5,6 @@ import (
 )
 
 func main() {
-
 	appServer := web.NewAppServer()
 	appServer.Init()
 	appServer.Run()

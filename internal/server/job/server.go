@@ -1,15 +1,21 @@
-package web
+package job
 
 import (
+	"fmt"
 	"lizard/internal/app/job"
 )
 
-type appServer struct {
+type jobServer struct {
 	iJobApp job.IJobApp
 }
 
-func (app *appServer) Init() {
+func (job *jobServer) Init() {
+	// TODO
+	job.iJobApp.Init()
+
 }
 
-func (app *appServer) Run() {
+func (job *jobServer) Run() {
+	// TODO
+	fmt.Printf("job run...")
 }

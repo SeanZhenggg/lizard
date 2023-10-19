@@ -1,7 +1,7 @@
 //go:build wireinject
 // +build wireinject
 
-package web
+package job
 
 import (
 	logUtils "github.com/SeanZhenggg/go-utils/logger"
@@ -15,7 +15,7 @@ import (
 	"lizard/internal/service"
 )
 
-func NewAppServer() *appServer {
+func NewJobServer() *jobServer {
 	panic(
 		wire.Build(
 			config.ProviderIConfigEnv,
@@ -27,7 +27,7 @@ func NewAppServer() *appServer {
 			job.ProvideJobController,
 			mongo.ProvideMongoDbCli,
 			jobApp.ProvideJobApp,
-			wire.Struct(new(appServer), "*"),
+			wire.Struct(new(jobServer), "*"),
 		),
 	)
 }

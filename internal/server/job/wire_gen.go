@@ -4,7 +4,7 @@
 //go:build !wireinject
 // +build !wireinject
 
-package web
+package job
 
 import (
 	"github.com/SeanZhenggg/go-utils/logger"
@@ -18,7 +18,7 @@ import (
 
 // Injectors from wire.go:
 
-func NewAppServer() *appServer {
+func NewJobServer() *jobServer {
 	iConfigEnv := config.ProviderIConfigEnv()
 	iLogConfig := config.ProviderILogConfig(iConfigEnv)
 	iLogger := logger.ProviderILogger(iLogConfig)
@@ -28,7 +28,7 @@ func NewAppServer() *appServer {
 	iTrendJobCtrl := job.ProviderITrendsJobCtrl(iTrendSrv)
 	controller := job.ProvideJobController(iTrendJobCtrl)
 	iJobApp := job2.ProvideJobApp(controller)
-	webAppServer := &appServer{
+	webAppServer := &jobServer{
 		iJobApp: iJobApp,
 	}
 	return webAppServer
