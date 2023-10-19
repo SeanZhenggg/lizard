@@ -1,10 +1,9 @@
 package middleware
 
 import (
-	"errors"
 	errorToolUtil "github.com/SeanZhenggg/go-utils/errortool"
 	"github.com/SeanZhenggg/go-utils/logger"
-	"lizard/source/utils/errs"
+	"lizard/internal/utils/errs"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -45,8 +44,7 @@ func (respMw *respMiddleware) generateStandardResponse(ctx *gin.Context) respons
 	var message string
 
 	if status >= http.StatusBadRequest {
-		var err error
-		if errors.As(data.(error), &err) {
+		if err, ok := data.(error); ok {
 			if parsed, ok := errorToolUtil.ParseError(err); ok {
 				code = parsed.GetCode()
 				message = parsed.GetMessage()

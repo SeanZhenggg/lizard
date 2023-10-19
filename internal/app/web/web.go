@@ -1,8 +1,8 @@
 package web
 
 import (
-	"lizard/source/controllers/web"
-	"lizard/source/controllers/web/middleware"
+	"lizard/internal/controller/web"
+	"lizard/internal/controller/web/middleware"
 
 	"github.com/gin-gonic/gin"
 )

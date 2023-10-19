@@ -2,7 +2,7 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
-	"lizard/source/app/web"
+	"lizard/internal/app/web"
 	"log"
 	"time"
 )

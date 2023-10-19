@@ -1,8 +1,8 @@
 package job
 
 import (
-	"lizard/source/controllers/web"
-	"lizard/source/controllers/web/middleware"
+	"lizard/internal/controller/web"
+	"lizard/internal/controller/web/middleware"
 )
 
 type IJobApp interface {

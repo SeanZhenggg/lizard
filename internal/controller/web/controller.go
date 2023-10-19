@@ -2,7 +2,7 @@ package web
 
 import (
 	"github.com/gin-gonic/gin"
-	"lizard/source/controllers/web/middleware"
+	"lizard/internal/controller/web/middleware"
 )
 
 func ProvideController(trendCtrl ITrendCtrl) *Controller {

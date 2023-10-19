@@ -2,7 +2,7 @@ package web
 
 import (
 	"github.com/gin-gonic/gin"
-	"lizard/source/service"
+	"lizard/internal/service"
 	"net/http"
 )
 

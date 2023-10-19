@@ -32,14 +32,14 @@ type Title struct {
 
 type Image struct {
 	NewsUrl  string `json:"newsUrl"`
-	Source   string `json:"source"`
+	Source   string `json:"internal"`
 	ImageUrl string `json:"imageUrl"`
 }
 
 type Article struct {
 	Title   string `json:"title"`
 	TimeAgo string `json:"timeAgo"`
-	Source  string `json:"source"`
+	Source  string `json:"internal"`
 	Image   *Image `json:"image"`
 	Url     string `json:"url"`
 	Snippet string `json:"snippet"`

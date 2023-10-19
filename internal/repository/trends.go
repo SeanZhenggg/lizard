@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/xerrors"
-	"lizard/source/model/po"
+	"lizard/internal/model/po"
 	"time"
 )
 

@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"github.com/SeanZhenggg/go-utils/logger"
 	"golang.org/x/xerrors"
-	"lizard/source/model/bo"
-	"lizard/source/model/po"
-	"lizard/source/mongo"
-	"lizard/source/repository"
-	"lizard/source/utils/request"
+	"lizard/internal/model/bo"
+	"lizard/internal/model/po"
+	"lizard/internal/mongo"
+	"lizard/internal/repository"
+	"lizard/internal/utils/request"
 	"regexp"
 )
 

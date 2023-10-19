@@ -3,7 +3,7 @@ package job
 import (
 	"github.com/SeanZhenggg/go-utils/logger"
 	"github.com/gin-gonic/gin"
-	"lizard/source/service"
+	"lizard/internal/service"
 )
 
 type ITrendCtrl interface {
