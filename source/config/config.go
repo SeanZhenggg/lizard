@@ -18,9 +18,9 @@ func ProviderIConfigEnv() IConfigEnv {
 		log.Fatalf("🔔🔔🔔 fatal error : APP_ENV required 🔔🔔🔔")
 	}
 
-	log.Printf("appEnv : %v, path: %s", appEnv, fmt.Sprintf("./config/%s", appEnv))
+	log.Printf("appEnv : %v, path: %s", appEnv, fmt.Sprintf("./configs/%s", appEnv))
 
-	viper.AddConfigPath(fmt.Sprintf("./config/%s/", appEnv))
+	viper.AddConfigPath(fmt.Sprintf("./configs/%s/", appEnv))
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 
