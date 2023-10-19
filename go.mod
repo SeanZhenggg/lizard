@@ -4,6 +4,7 @@ require (
 	github.com/SeanZhenggg/go-utils v0.0.0-20231016014241-37eb939c1e5f
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/wire v0.5.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/spf13/viper v1.17.0
 	go.mongodb.org/mongo-driver v1.9.1
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
@@ -33,7 +34,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/sagikazarmark/locafero v0.3.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect

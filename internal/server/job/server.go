@@ -1,7 +1,6 @@
 package job
 
 import (
-	"fmt"
 	"lizard/internal/app/job"
 )
 
@@ -17,5 +16,5 @@ func (job *jobServer) Init() {
 
 func (job *jobServer) Run() {
 	// TODO
-	fmt.Printf("job run...")
+	job.iJobApp.Run()
 }
