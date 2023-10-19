@@ -1,10 +1,12 @@
 package web
 
-import "lizard/internal/server"
+import (
+	"lizard/internal/server/web"
+)
 
 func main() {
 
-	appServer := server.NewAppServer()
+	appServer := web.NewAppServer()
 	appServer.Init()
 	appServer.Run()
 }

@@ -1,8 +1,7 @@
 package job
 
 import (
-	"lizard/internal/controller/web"
-	"lizard/internal/controller/web/middleware"
+	"lizard/internal/controller/job"
 )
 
 type IJobApp interface {
@@ -10,21 +9,15 @@ type IJobApp interface {
 }
 
 func ProvideJobApp(
-	ctrl *web.Controller,
-	respMw middleware.IResponseMiddleware,
-	authMw middleware.IAuthMiddleware,
+	ctrl *job.Controller,
 ) IJobApp {
 	return &jobApp{
-		Ctrl:   ctrl,
-		RespMw: respMw,
-		AuthMw: authMw,
+		Ctrl: ctrl,
 	}
 }
 
 type jobApp struct {
-	Ctrl   *web.Controller
-	RespMw middleware.IResponseMiddleware
-	AuthMw middleware.IAuthMiddleware
+	Ctrl *job.Controller
 }
 
 func (app *jobApp) Init() {

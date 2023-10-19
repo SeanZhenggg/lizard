@@ -1,15 +1,15 @@
 //go:build wireinject
 // +build wireinject
 
-package server
+package web
 
 import (
 	logUtils "github.com/SeanZhenggg/go-utils/logger"
 	"github.com/google/wire"
-	"lizard/internal/app/web"
+	jobApp "lizard/internal/app/job"
 	"lizard/internal/config"
-	web2 "lizard/internal/controller/web"
-	middleware2 "lizard/internal/controller/web/middleware"
+
+	"lizard/internal/controller/job"
 	"lizard/internal/mongo"
 	"lizard/internal/repository"
 	"lizard/internal/service"
@@ -22,13 +22,11 @@ func NewAppServer() *appServer {
 			config.ProviderILogConfig,
 			logUtils.ProviderILogger,
 			repository.ProvideTrendRepository,
-			middleware2.ProvideResponseMiddleware,
-			middleware2.ProvideAuthMiddleware,
 			service.ProviderITrendsSrv,
-			web2.ProviderITrendsCtrl,
-			web2.ProvideController,
+			job.ProviderITrendsJobCtrl,
+			job.ProvideJobController,
 			mongo.ProvideMongoDbCli,
-			web.ProvideWebApp,
+			jobApp.ProvideJobApp,
 			wire.Struct(new(appServer), "*"),
 		),
 	)

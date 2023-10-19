@@ -4,7 +4,7 @@
 //go:build !wireinject
 // +build !wireinject
 
-package server
+package web
 
 import (
 	"github.com/SeanZhenggg/go-utils/logger"
@@ -31,8 +31,8 @@ func NewAppServer() *appServer {
 	iResponseMiddleware := middleware.ProvideResponseMiddleware(iLogger)
 	iAuthMiddleware := middleware.ProvideAuthMiddleware(iLogger)
 	iWebApp := web2.ProvideWebApp(controller, iResponseMiddleware, iAuthMiddleware)
-	serverAppServer := &appServer{
+	webAppServer := &appServer{
 		iWebApp: iWebApp,
 	}
-	return serverAppServer
+	return webAppServer
 }
