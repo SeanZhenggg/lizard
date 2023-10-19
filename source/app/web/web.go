@@ -2,7 +2,7 @@ package web
 
 import (
 	"lizard/source/controllers/web"
-	middleware2 "lizard/source/controllers/web/middleware"
+	"lizard/source/controllers/web/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,8 +13,8 @@ type IWebApp interface {
 
 func ProvideWebApp(
 	ctrl *web.Controller,
-	respMw middleware2.IResponseMiddleware,
-	authMw middleware2.IAuthMiddleware,
+	respMw middleware.IResponseMiddleware,
+	authMw middleware.IAuthMiddleware,
 ) IWebApp {
 	return &webApp{
 		Ctrl:   ctrl,
@@ -25,8 +25,8 @@ func ProvideWebApp(
 
 type webApp struct {
 	Ctrl   *web.Controller
-	RespMw middleware2.IResponseMiddleware
-	AuthMw middleware2.IAuthMiddleware
+	RespMw middleware.IResponseMiddleware
+	AuthMw middleware.IAuthMiddleware
 }
 
 func (app *webApp) Init(g *gin.Engine) {

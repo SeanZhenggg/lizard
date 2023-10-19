@@ -3,7 +3,8 @@ package middleware
 import (
 	"errors"
 	errorToolUtil "github.com/SeanZhenggg/go-utils/errortool"
-	"lizard/source/utils/errortool"
+	"github.com/SeanZhenggg/go-utils/logger"
+	"lizard/source/utils/errs"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,13 +19,17 @@ type IResponseMiddleware interface {
 	ResponseHandler(ctx *gin.Context)
 }
 
-func ProvideResponseMiddleware() IResponseMiddleware {
-	return &ResponseMiddleware{}
+func ProvideResponseMiddleware(logger logger.ILogger) IResponseMiddleware {
+	return &respMiddleware{
+		logger,
+	}
 }
 
-type ResponseMiddleware struct{}
+type respMiddleware struct {
+	logger logger.ILogger
+}
 
-func (respMw *ResponseMiddleware) ResponseHandler(ctx *gin.Context) {
+func (respMw *respMiddleware) ResponseHandler(ctx *gin.Context) {
 	// before request
 
 	ctx.Next()
@@ -33,7 +38,7 @@ func (respMw *ResponseMiddleware) ResponseHandler(ctx *gin.Context) {
 	respMw.standardResponse(ctx)
 }
 
-func (respMw *ResponseMiddleware) generateStandardResponse(ctx *gin.Context) response {
+func (respMw *respMiddleware) generateStandardResponse(ctx *gin.Context) response {
 	status := ctx.GetInt(RespStatus)
 	data := ctx.MustGet(RespData)
 	var code int
@@ -46,11 +51,13 @@ func (respMw *ResponseMiddleware) generateStandardResponse(ctx *gin.Context) res
 				code = parsed.GetCode()
 				message = parsed.GetMessage()
 			} else {
-				err, _ := errorToolUtil.ParseError(errortool.CommonErr.UnknownError)
+				err, _ := errorToolUtil.ParseError(errs.CommonErr.UnknownError)
 				code = err.GetCode()
 				message = err.GetMessage()
 			}
 			data = nil
+
+			respMw.logger.Error(err)
 		}
 	}
 
@@ -61,7 +68,7 @@ func (respMw *ResponseMiddleware) generateStandardResponse(ctx *gin.Context) res
 	}
 }
 
-func (respMw *ResponseMiddleware) standardResponse(ctx *gin.Context) {
+func (respMw *respMiddleware) standardResponse(ctx *gin.Context) {
 	response := respMw.generateStandardResponse(ctx)
 
 	respStatus := ctx.GetInt(RespStatus)

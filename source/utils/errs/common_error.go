@@ -1,4 +1,4 @@
-package errortool
+package errs
 
 import "github.com/SeanZhenggg/go-utils/errortool"
 
