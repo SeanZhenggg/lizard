@@ -19,6 +19,9 @@ func NewAppServer() *appServer {
 	panic(
 		wire.Build(
 			config.ProviderIConfigEnv,
+			// update : 這裡告訴 wire IConfigEnv 可以當作 ILogConfig
+			// 下面就能正確注入 ILogConfig 到 logUtils.ProviderILogger
+			wire.Bind(new(logUtils.ILogConfig), new(config.IConfigEnv)),
 			// 沒有這個的話 ProviderILogger 在 wire gen 會報錯
 			//config.ProviderILogConfig,
 			logUtils.ProviderILogger,

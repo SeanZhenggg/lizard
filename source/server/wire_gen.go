@@ -21,9 +21,7 @@ import (
 
 func NewAppServer() *appServer {
 	iConfigEnv := config.ProviderIConfigEnv()
-	// 這個會動，但是沒辦法透過 wire gen 出來，但其實是有實作 ILogConfig interface 的
-	iLogConfig := config.ProviderILogConfig(iConfigEnv)
-	iLogger := logger.ProviderILogger(iLogConfig)
+	iLogger := logger.ProviderILogger(iConfigEnv)
 	iMongoCli := mongo.ProvideMongoDbCli(iConfigEnv)
 	iTrendRepository := repository.ProvideTrendRepository()
 	iTrendSrv := service.ProviderITrendsSrv(iLogger, iMongoCli, iTrendRepository)
