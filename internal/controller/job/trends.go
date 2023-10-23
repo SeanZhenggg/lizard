@@ -1,12 +1,12 @@
 package job
 
 import (
-	"github.com/gin-gonic/gin"
 	"lizard/internal/service"
+	"lizard/internal/utils/cronjob"
 )
 
 type ITrendJobCtrl interface {
-	FetchTrends(ctx *gin.Context)
+	FetchTrends(ctx *cronjob.Context)
 }
 
 func ProviderITrendsJobCtrl(trendSrv service.ITrendSrv) ITrendJobCtrl {
@@ -19,7 +19,7 @@ type trendJobCtrl struct {
 	trendSrv service.ITrendSrv
 }
 
-func (t *trendJobCtrl) FetchTrends(ctx *gin.Context) {
+func (t *trendJobCtrl) FetchTrends(ctx *cronjob.Context) {
 	err := t.trendSrv.FetchTrends(ctx)
 	if err != nil {
 		return

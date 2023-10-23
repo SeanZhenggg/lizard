@@ -2,6 +2,7 @@ package job
 
 import (
 	"lizard/internal/app/job"
+	"log"
 )
 
 type jobServer struct {
@@ -16,5 +17,6 @@ func (job *jobServer) Init() {
 
 func (job *jobServer) Run() {
 	// TODO
-	job.iJobApp.Run()
+	log.Printf("jobServer Start")
+	job.iJobApp.Start()
 }

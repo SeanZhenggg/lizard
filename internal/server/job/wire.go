@@ -8,6 +8,7 @@ import (
 	"github.com/google/wire"
 	jobApp "lizard/internal/app/job"
 	"lizard/internal/config"
+	"lizard/internal/utils/cronjob"
 
 	"lizard/internal/controller/job"
 	"lizard/internal/mongo"
@@ -19,7 +20,8 @@ func NewJobServer() *jobServer {
 	panic(
 		wire.Build(
 			config.ProviderIConfigEnv,
-			config.ProviderILogConfig,
+			cronjob.ProviderCronJob,
+			wire.Bind(new(logUtils.ILogConfig), new(config.IConfigEnv)),
 			logUtils.ProviderILogger,
 			repository.ProvideTrendRepository,
 			service.ProviderITrendsSrv,

@@ -14,22 +14,23 @@ import (
 	"lizard/internal/mongo"
 	"lizard/internal/repository"
 	"lizard/internal/service"
+	"lizard/internal/utils/cronjob"
 )
 
 // Injectors from wire.go:
 
 func NewJobServer() *jobServer {
 	iConfigEnv := config.ProviderIConfigEnv()
-	iLogConfig := config.ProviderILogConfig(iConfigEnv)
-	iLogger := logger.ProviderILogger(iLogConfig)
+	iLogger := logger.ProviderILogger(iConfigEnv)
 	iMongoCli := mongo.ProvideMongoDbCli(iConfigEnv)
 	iTrendRepository := repository.ProvideTrendRepository()
 	iTrendSrv := service.ProviderITrendsSrv(iLogger, iMongoCli, iTrendRepository)
 	iTrendJobCtrl := job.ProviderITrendsJobCtrl(iTrendSrv)
 	controller := job.ProvideJobController(iTrendJobCtrl)
-	iJobApp := job2.ProvideJobApp(controller)
-	webAppServer := &jobServer{
+	iCronJob := cronjob.ProviderCronJob(iLogger)
+	iJobApp := job2.ProvideJobApp(controller, iCronJob, iLogger)
+	jobJobServer := &jobServer{
 		iJobApp: iJobApp,
 	}
-	return webAppServer
+	return jobJobServer
 }

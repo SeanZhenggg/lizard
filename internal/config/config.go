@@ -2,13 +2,14 @@ package config
 
 import (
 	"fmt"
+	"github.com/SeanZhenggg/go-utils/logger"
 	"github.com/spf13/viper"
 	"log"
 	"os"
 )
 
 type IConfigEnv interface {
-	GetLogConfig() logConfig
+	GetLogConfig() logger.LogConfig
 	GetDbConfig() DbConfig
 }
 
@@ -24,17 +25,14 @@ func ProviderIConfigEnv() IConfigEnv {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 
-	// 读取配置文件
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("🔔🔔🔔 fatal error viper.ReadInConfig: %v 🔔🔔🔔", err)
 	}
-	log.Printf("%v", viper.Get("log"))
-	// 将配置映射到结构体
+
 	var cfg configEnv
 	if err := viper.Unmarshal(&cfg); err != nil {
 		log.Fatalf("🔔🔔🔔 fatal error viper.Unmarshal: %v 🔔🔔🔔", err)
 	}
-	log.Printf("cfg: %v", cfg)
 
 	return &cfg
 }
@@ -56,8 +54,8 @@ type DbConfig struct {
 	DbName string `mapstructure:"dbName"`
 }
 
-func (c *configEnv) GetLogConfig() logConfig {
-	return c.LogConfig
+func (c *configEnv) GetLogConfig() logger.LogConfig {
+	return logger.LogConfig(c.LogConfig)
 }
 
 func (c *configEnv) GetDbConfig() DbConfig {

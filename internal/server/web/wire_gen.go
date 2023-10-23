@@ -21,8 +21,7 @@ import (
 
 func NewAppServer() *appServer {
 	iConfigEnv := config.ProviderIConfigEnv()
-	iLogConfig := config.ProviderILogConfig(iConfigEnv)
-	iLogger := logger.ProviderILogger(iLogConfig)
+	iLogger := logger.ProviderILogger(iConfigEnv)
 	iMongoCli := mongo.ProvideMongoDbCli(iConfigEnv)
 	iTrendRepository := repository.ProvideTrendRepository()
 	iTrendSrv := service.ProviderITrendsSrv(iLogger, iMongoCli, iTrendRepository)
