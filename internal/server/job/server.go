@@ -3,6 +3,9 @@ package job
 import (
 	"lizard/internal/app/job"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 type jobServer struct {
@@ -10,13 +13,19 @@ type jobServer struct {
 }
 
 func (job *jobServer) Init() {
-	// TODO
 	job.iJobApp.Init()
-
 }
 
 func (job *jobServer) Run() {
-	// TODO
-	log.Printf("jobServer Start")
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+
 	job.iJobApp.Start()
+
+	select {
+	case <-interrupt:
+		ctx := job.iJobApp.Stop()
+		<-ctx.Done()
+		log.Printf("gracefully shutdown the job service...")
+	}
 }

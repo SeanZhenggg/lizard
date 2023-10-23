@@ -22,10 +22,11 @@ import (
 func NewJobServer() *jobServer {
 	iConfigEnv := config.ProviderIConfigEnv()
 	iLogger := logger.ProviderILogger(iConfigEnv)
+	iMessageSrv := service.ProvideLineSrv(iLogger)
 	iMongoCli := mongo.ProvideMongoDbCli(iConfigEnv)
 	iTrendRepository := repository.ProvideTrendRepository()
 	iTrendSrv := service.ProviderITrendsSrv(iLogger, iMongoCli, iTrendRepository)
-	iTrendJobCtrl := job.ProviderITrendsJobCtrl(iTrendSrv)
+	iTrendJobCtrl := job.ProviderITrendsJobCtrl(iMessageSrv, iTrendSrv)
 	controller := job.ProvideJobController(iTrendJobCtrl)
 	iCronJob := cronjob.ProviderCronJob(iLogger)
 	iJobApp := job2.ProvideJobApp(controller, iCronJob, iLogger)

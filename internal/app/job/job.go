@@ -1,17 +1,17 @@
 package job
 
 import (
+	"context"
 	"github.com/SeanZhenggg/go-utils/logger"
 	"golang.org/x/xerrors"
 	"lizard/internal/controller/job"
 	"lizard/internal/utils/cronjob"
-	"log"
 )
 
 type IJobApp interface {
 	Init()
 	Start()
-	Stop()
+	Stop() context.Context
 }
 
 func ProvideJobApp(
@@ -34,27 +34,28 @@ type jobApp struct {
 
 func (app *jobApp) Init() {
 	app.cron.Use(func(ctx *cronjob.Context) {
-		log.Printf("this is middleware start...")
+		app.logger.Info("this is middleware start...")
 		ctx.Next()
-		log.Printf("this is middleware end...")
+		app.logger.Info("this is middleware end...")
 	})
 
-	//_, err := app.cron.AddScheduleFunc("* * * * *", app.ctrl.TrendJobCtrl.FetchTrends)
-	_, err := app.cron.AddScheduleFunc("* * * * *", func(ctx *cronjob.Context) {
-		log.Printf("running job do something...")
-	})
+	//_, err := app.cron.AddScheduleFunc("*/3 * * * * *", func(ctx *cronjob.Context) {
+	//	app.logger.Info("running job do something...")
+	//	<-time.After(5 * time.Second)
+	//	app.logger.Info("running job completed...")
+	//})
+	_, err := app.cron.AddScheduleFunc("*/3 * * * * *", app.ctrl.TrendJobCtrl.SendToClient)
 
 	if err != nil {
-		app.logger.Error(xerrors.Errorf("jobApp Init error: %w", err))
+		app.logger.Error(xerrors.Errorf("jobApp Init app.cron.AddScheduleFunc error: %w", err))
 		return
 	}
 }
 
 func (app *jobApp) Start() {
-	log.Printf("jobApp Start")
 	app.cron.Start()
 }
 
-func (app *jobApp) Stop() {
-	app.cron.Stop()
+func (app *jobApp) Stop() context.Context {
+	return app.cron.Stop()
 }

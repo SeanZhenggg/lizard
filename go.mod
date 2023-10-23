@@ -4,6 +4,7 @@ require (
 	github.com/SeanZhenggg/go-utils v0.0.0-20231016014241-37eb939c1e5f
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/wire v0.5.0
+	github.com/line/line-bot-sdk-go/v7 v7.21.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/spf13/viper v1.17.0
 	go.mongodb.org/mongo-driver v1.9.1

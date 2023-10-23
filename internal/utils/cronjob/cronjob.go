@@ -1,29 +1,30 @@
 package cronjob
 
 import (
+	"context"
 	"github.com/SeanZhenggg/go-utils/logger"
 	"github.com/robfig/cron/v3"
-	"log"
 )
 
 type ICronJob interface {
 	Use(job ...FuncJob)
 	Start()
-	Stop()
+	Stop() context.Context
 	AddScheduleFunc(spec string, cmd FuncJob) (cron.EntryID, error)
 }
 
 func ProviderCronJob(logger logger.ILogger) ICronJob {
 	return &cronJob{
-		cron:   cron.New(),
+		cron:   cron.New(cron.WithSeconds()),
 		logger: logger,
 	}
 }
 
 type cronJob struct {
-	cron     *cron.Cron
-	handlers handlerChain
-	logger   logger.ILogger
+	cron      *cron.Cron
+	handlers  handlerChain
+	logger    logger.ILogger
+	closeChan chan struct{}
 }
 
 func (cj *cronJob) AddScheduleFunc(spec string, cmd FuncJob) (cron.EntryID, error) {
@@ -35,16 +36,11 @@ func (cj *cronJob) Use(job ...FuncJob) {
 }
 
 func (cj *cronJob) Start() {
-	log.Printf("cronjob Start")
 	cj.cron.Start()
 }
 
-func (cj *cronJob) Stop() {
-	ctx := cj.cron.Stop()
-
-	log.Printf("running cron job not completed...")
-	<-ctx.Done()
-	log.Printf("running completed...")
+func (cj *cronJob) Stop() context.Context {
+	return cj.cron.Stop()
 }
 
 func (cj *cronJob) addScheduleFunc(spec string, cmd FuncJob) (cron.EntryID, error) {
