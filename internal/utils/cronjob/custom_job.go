@@ -1,17 +1,17 @@
 package cronjob
 
-func NewCustomJobFunc(c *cronJob, cmd FuncJob) *CustomJob {
-	return &CustomJob{
+func NewCustomJobFunc(c *cronJob, cmd FuncJob) *customJob {
+	return &customJob{
 		handlers: append(c.handlers, cmd),
 	}
 }
 
-type CustomJob struct {
+type customJob struct {
 	ctx      *Context
 	handlers handlerChain
 }
 
-func (job *CustomJob) Run() {
+func (job *customJob) Run() {
 	job.ctx = &Context{}
 	job.ctx.reset(job.handlers)
 	job.ctx.Next()
