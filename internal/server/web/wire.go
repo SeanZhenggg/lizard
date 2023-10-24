@@ -26,6 +26,7 @@ func NewAppServer() *appServer {
 			middleware.ProvideAuthMiddleware,
 			service.ProviderITrendsSrv,
 			webApp.ProviderITrendsCtrl,
+			webApp.ProvideMessageCtrl,
 			webApp.ProvideController,
 			mongo.ProvideMongoDbCli,
 			web.ProvideWebApp,

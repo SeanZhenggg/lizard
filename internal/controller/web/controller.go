@@ -5,14 +5,16 @@ import (
 	"lizard/internal/controller/web/middleware"
 )
 
-func ProvideController(trendCtrl ITrendCtrl) *Controller {
+func ProvideController(lineCtrl IMessageCtrl, trendCtrl ITrendCtrl) *Controller {
 	return &Controller{
-		TrendCtrl: trendCtrl,
+		TrendCtrl:   trendCtrl,
+		MessageCtrl: lineCtrl,
 	}
 }
 
 type Controller struct {
-	TrendCtrl ITrendCtrl
+	TrendCtrl   ITrendCtrl
+	MessageCtrl IMessageCtrl
 }
 
 type StandardResponse struct{}

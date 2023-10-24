@@ -44,7 +44,7 @@ func (app *jobApp) Init() {
 	//	<-time.After(5 * time.Second)
 	//	app.logger.Info("running job completed...")
 	//})
-	_, err := app.cron.AddScheduleFunc("*/3 * * * * *", app.ctrl.TrendJobCtrl.SendToClient)
+	_, err := app.cron.AddScheduleFunc("*/3 * * * * *", app.ctrl.TrendJobCtrl.SendToGroup)
 
 	if err != nil {
 		app.logger.Error(xerrors.Errorf("jobApp Init app.cron.AddScheduleFunc error: %w", err))

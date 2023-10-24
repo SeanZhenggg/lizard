@@ -20,13 +20,14 @@ import (
 // Injectors from wire.go:
 
 func NewAppServer() *appServer {
+	iMessageCtrl := web.ProvideMessageCtrl()
 	iConfigEnv := config.ProviderIConfigEnv()
 	iLogger := logger.ProviderILogger(iConfigEnv)
 	iMongoCli := mongo.ProvideMongoDbCli(iConfigEnv)
 	iTrendRepository := repository.ProvideTrendRepository()
 	iTrendSrv := service.ProviderITrendsSrv(iLogger, iMongoCli, iTrendRepository)
 	iTrendCtrl := web.ProviderITrendsCtrl(iTrendSrv)
-	controller := web.ProvideController(iTrendCtrl)
+	controller := web.ProvideController(iMessageCtrl, iTrendCtrl)
 	iResponseMiddleware := middleware.ProvideResponseMiddleware(iLogger)
 	iAuthMiddleware := middleware.ProvideAuthMiddleware(iLogger)
 	iWebApp := web2.ProvideWebApp(controller, iResponseMiddleware, iAuthMiddleware)
