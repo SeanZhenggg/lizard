@@ -1,7 +1,7 @@
 module lizard
 
 require (
-	github.com/SeanZhenggg/go-utils v0.0.0-20231025161716-332e0ca94e1b
+	github.com/SeanZhenggg/go-utils v0.0.0-20231025171612-11575a9e4562
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/wire v0.5.0
 	github.com/line/line-bot-sdk-go/v7 v7.21.0

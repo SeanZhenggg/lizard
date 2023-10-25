@@ -1,4 +1,4 @@
-# github.com/SeanZhenggg/go-utils v0.0.0-20231025161716-332e0ca94e1b
+# github.com/SeanZhenggg/go-utils v0.0.0-20231025171612-11575a9e4562
 ## explicit; go 1.21.1
 github.com/SeanZhenggg/go-utils/errortool
 github.com/SeanZhenggg/go-utils/logger

@@ -9,7 +9,7 @@ func ParseError(err error) (*CustomError, bool) {
 	newError := err
 	for {
 		tmp := errors.Unwrap(newError)
-		if tmp != nil {
+		if tmp == nil {
 			break
 		}
 		newError = tmp
