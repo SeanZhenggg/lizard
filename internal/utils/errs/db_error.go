@@ -1,15 +1,11 @@
 package errs
 
-import (
-	"github.com/SeanZhenggg/go-utils/errortool"
-)
-
 const (
 	DBGroupCode int = 9
 )
 
-func ProvideDBError(groups errortool.IGroupRepo, codes errortool.ICodeRepo) interface{} {
-	group := Define.GenGroup(DBGroupCode)
+func ProvideDBError() *dbError {
+	group := Define.GenErrorGroup(DBGroupCode)
 
 	return &dbError{
 		TestError: group.GenError(1, "Test error"),
