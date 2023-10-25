@@ -39,12 +39,7 @@ func (app *jobApp) Init() {
 		app.logger.Info("this is middleware end...")
 	})
 
-	//_, err := app.cron.AddScheduleFunc("*/3 * * * * *", func(ctx *cronjob.Context) {
-	//	app.logger.Info("running job do something...")
-	//	<-time.After(5 * time.Second)
-	//	app.logger.Info("running job completed...")
-	//})
-	_, err := app.cron.AddScheduleFunc("*/3 * * * * *", app.ctrl.TrendJobCtrl.SendToGroup)
+	_, err := app.cron.AddScheduleFunc("*/3 * * * * *", app.ctrl.TrendJobCtrl.FetchTrendsAndPush)
 
 	if err != nil {
 		app.logger.Error(xerrors.Errorf("jobApp Init app.cron.AddScheduleFunc error: %w", err))

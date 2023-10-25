@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/SeanZhenggg/go-utils/logger"
 	"golang.org/x/xerrors"
+	"lizard/internal/constant"
 	"lizard/internal/model/bo"
 	"lizard/internal/model/po"
 	"lizard/internal/mongo"
@@ -34,7 +35,7 @@ type trendSrv struct {
 func (t *trendSrv) FetchTrends(ctx context.Context) error {
 	client := request.NewClient(t.logger)
 
-	response, err := client.HttpGet("https://trends.google.com/trends/api/dailytrends", map[string]string{
+	response, err := client.HttpGet(constant.GoogleDailyTrendUrl, map[string]string{
 		"hl":  "zh-TW",
 		"tz":  "-480",
 		"geo": "TW",
@@ -60,16 +61,23 @@ func (t *trendSrv) FetchTrends(ctx context.Context) error {
 		return xerrors.Errorf("trendsSrv fetch error: trend.Default is nil")
 	}
 
-	var testFlag bool
-	poTrends := make([]*po.Trend, 0, len(trend.Default.TrendingSearchesDays))
-	for _, tr := range trend.Default.TrendingSearchesDays {
-		poTrend := &po.Trend{}
-		poTrend.Date = tr.Date
+	db := t.db.GetCollection(ctx, "trends")
+	aiIdInfo := t.repo.GetAiIDInfo(ctx, db)
+	var curMaxId int64
+	if aiIdInfo == nil {
+		curMaxId = constant.MIN_ID_VALUE
+	} else {
+		curMaxId = aiIdInfo.AiID
+	}
 
+	poTrends := make([]*po.Trend, 0, len(trend.Default.TrendingSearchesDays))
+
+	for _, tr := range trend.Default.TrendingSearchesDays {
 		for i, search := range tr.TrendingSearches {
-			if i > 0 {
-				testFlag = true
-				break
+			poTrend := &po.Trend{
+				Date:             tr.Date,
+				FormattedTraffic: search.FormattedTraffic,
+				AiID:             curMaxId + int64(i+1),
 			}
 
 			if search.Title != nil {
@@ -77,7 +85,6 @@ func (t *trendSrv) FetchTrends(ctx context.Context) error {
 				poTrend.TitleExploreLink = search.Title.ExploreLink
 			}
 
-			poTrend.FormattedTraffic = search.FormattedTraffic
 			if search.Image != nil {
 				poTrend.Image = search.Image.Source
 				poTrend.ImageUrl = search.Image.ImageUrl
@@ -86,16 +93,11 @@ func (t *trendSrv) FetchTrends(ctx context.Context) error {
 
 			poTrends = append(poTrends, poTrend)
 		}
-
-		if testFlag {
-			break
-		}
 	}
 
-	db := t.db.GetCollection(ctx, "trends")
-	err = t.repo.BatchInsert(ctx, db, poTrends)
+	err = t.repo.BatchUpsert(ctx, db, poTrends)
 	if err != nil {
-		return xerrors.Errorf("trendsSrv FetchTrends t.repo.BatchInsert error: %w", err)
+		return xerrors.Errorf("trendsSrv FetchTrends t.repo.BatchUpsert error: %w", err)
 	}
 
 	return nil
