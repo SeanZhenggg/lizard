@@ -5,6 +5,7 @@ import (
 	"github.com/SeanZhenggg/go-utils/logger"
 	"golang.org/x/xerrors"
 	"lizard/internal/controller/job"
+	"lizard/internal/controller/job/middleware"
 	"lizard/internal/utils/cronjob"
 )
 
@@ -18,9 +19,11 @@ func ProvideJobApp(
 	ctrl *job.Controller,
 	cron cronjob.ICronJob,
 	logger logger.ILogger,
+	mw middleware.IJobLogMiddleware,
 ) IJobApp {
 	return &jobApp{
 		ctrl:   ctrl,
+		mw:     mw,
 		cron:   cron,
 		logger: logger,
 	}
@@ -30,14 +33,11 @@ type jobApp struct {
 	ctrl   *job.Controller
 	cron   cronjob.ICronJob
 	logger logger.ILogger
+	mw     middleware.IJobLogMiddleware
 }
 
 func (app *jobApp) Init() {
-	app.cron.Use(func(ctx *cronjob.Context) {
-		app.logger.Info("this is middleware start...")
-		ctx.Next()
-		app.logger.Info("this is middleware end...")
-	})
+	app.cron.Use(app.mw.Handle)
 
 	_, err := app.cron.AddScheduleFunc("*/3 * * * * *", app.ctrl.TrendJobCtrl.FetchTrendsAndPush)
 

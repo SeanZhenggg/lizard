@@ -15,7 +15,7 @@ const (
 )
 
 type IResponseMiddleware interface {
-	ResponseHandler(ctx *gin.Context)
+	Handle(ctx *gin.Context)
 }
 
 func ProvideResponseMiddleware(logger logger.ILogger) IResponseMiddleware {
@@ -28,7 +28,7 @@ type respMiddleware struct {
 	logger logger.ILogger
 }
 
-func (respMw *respMiddleware) ResponseHandler(ctx *gin.Context) {
+func (respMw *respMiddleware) Handle(ctx *gin.Context) {
 	// before request
 
 	ctx.Next()

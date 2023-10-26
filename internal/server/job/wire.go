@@ -10,7 +10,8 @@ import (
 	"lizard/internal/config"
 	"lizard/internal/utils/cronjob"
 
-	"lizard/internal/controller/job"
+	jobCtrl "lizard/internal/controller/job"
+	jobMw "lizard/internal/controller/job/middleware"
 	"lizard/internal/mongo"
 	"lizard/internal/repository"
 	"lizard/internal/service"
@@ -23,11 +24,12 @@ func NewJobServer() *jobServer {
 			cronjob.ProviderCronJob,
 			wire.Bind(new(logUtils.ILogConfig), new(config.IConfigEnv)),
 			logUtils.ProviderILogger,
+			jobMw.ProvideJobLogMiddleware,
 			repository.ProvideTrendRepository,
 			service.ProviderITrendsSrv,
 			service.ProvideLineSrv,
-			job.ProviderITrendsJobCtrl,
-			job.ProvideJobController,
+			jobCtrl.ProviderITrendsJobCtrl,
+			jobCtrl.ProvideJobController,
 			mongo.ProvideMongoDbCli,
 			jobApp.ProvideJobApp,
 			wire.Struct(new(jobServer), "*"),
