@@ -13,8 +13,10 @@ import (
 )
 
 type ITrendRepository interface {
-	GetAiIDInfo(ctx context.Context, db *mongo.Collection) *po.TrendAiIDInfo
-	BatchUpsert(ctx context.Context, db *mongo.Collection, data []*po.Trend) error
+	GetMaxAiIDInfo(ctx context.Context, db *mongo.Collection) (*po.TrendMaxAiID, error)
+	GetMatchedExistedTrends(ctx context.Context, db *mongo.Collection, data []*po.Trend) ([]*po.Trend, error)
+	BatchInsert(ctx context.Context, db *mongo.Collection, data []*po.Trend) error
+	BatchUpdate(ctx context.Context, db *mongo.Collection, data []*po.Trend, inDbMap map[string]*po.Trend) error
 }
 
 func ProvideTrendRepository() ITrendRepository {
@@ -24,8 +26,8 @@ func ProvideTrendRepository() ITrendRepository {
 type trendRepo struct {
 }
 
-func (repo *trendRepo) GetAiIDInfo(ctx context.Context, db *mongo.Collection) *po.TrendAiIDInfo {
-	var res *po.TrendAiIDInfo
+func (repo *trendRepo) GetMaxAiIDInfo(ctx context.Context, db *mongo.Collection) (*po.TrendMaxAiID, error) {
+	var res *po.TrendMaxAiID
 	if err := db.
 		FindOne(
 			ctx,
@@ -33,55 +35,77 @@ func (repo *trendRepo) GetAiIDInfo(ctx context.Context, db *mongo.Collection) *p
 			options.FindOne().SetSort(bson.M{"ai_id": -1}).SetProjection(bson.M{"ai_id": 1})).
 		Decode(&res); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return res
+			return nil, nil
 		}
+
+		return nil, xerrors.Errorf("trendRepo GetMaxAiIDInfo FindOne.Decode error : %w", err)
 	}
 
-	return res
+	return res, nil
 }
 
-func (repo *trendRepo) BatchUpsert(ctx context.Context, db *mongo.Collection, data []*po.Trend) error {
+func (repo *trendRepo) GetMatchedExistedTrends(ctx context.Context, db *mongo.Collection, data []*po.Trend) ([]*po.Trend, error) {
+	currentUIds := make([]string, 0, len(data))
+	var trendsInDb []*po.Trend
+
+	for _, trend := range data {
+		currentUIds = append(currentUIds, trend.UID)
+	}
+
+	result, err := db.Find(ctx, bson.M{"uid": bson.M{"$in": currentUIds}})
+	defer func() { result.Close(ctx) }()
+
+	if err != nil {
+		return nil, xerrors.Errorf("trendRepo GetMatchedExistedTrends db.Find error : %w", err)
+	}
+
+	err = result.All(ctx, &trendsInDb)
+	if err != nil {
+		return nil, xerrors.Errorf("trendRepo GetMatchedExistedTrends db.Find.All error : %w", err)
+	}
+
+	return trendsInDb, nil
+}
+
+func (repo *trendRepo) BatchInsert(ctx context.Context, db *mongo.Collection, data []*po.Trend) error {
 	writeModels := make([]mongo.WriteModel, 0, len(data))
 
 	for _, trend := range data {
-		var trendInDb po.Trend
-
-		uid := trend.GenUID()
-		err := db.FindOne(ctx, bson.M{"uid": uid}).Decode(&trendInDb)
-		if err != nil {
-			if !errors.Is(err, mongo.ErrNoDocuments) {
-				return xerrors.Errorf("trendRepo BatchUpsert db.FindOne error : %w", err)
-			}
-
-			// insert
-			trend.ID = primitive.NewObjectID()
-			trend.UID = uid
-			trend.CreatedAt = time.Now()
-			trend.UpdatedAt = time.Now()
-			insertModel := mongo.NewInsertOneModel().SetDocument(trend)
-			writeModels = append(writeModels, insertModel)
-			continue
-		}
-
-		// update
-		updateModel := mongo.NewUpdateOneModel().
-			SetFilter(bson.M{"_id": trendInDb.ID}).
-			SetUpdate(
-				bson.M{"$set": bson.M{
-					"title":             trend.Title,
-					"title_explore":     trend.TitleExploreLink,
-					"formatted_traffic": trend.FormattedTraffic,
-					"image":             trend.Image,
-					"image_url":         trend.ImageUrl,
-					"image_news_url":    trend.ImageNewsUrl,
-					"updated_at":        time.Now(),
-				}})
-		writeModels = append(writeModels, updateModel)
+		trend.ID = primitive.NewObjectID()
+		trend.CreatedAt = time.Now()
+		trend.UpdatedAt = time.Now()
+		insertModel := mongo.NewInsertOneModel().SetDocument(trend)
+		writeModels = append(writeModels, insertModel)
 	}
 
 	_, err := db.BulkWrite(ctx, writeModels, options.BulkWrite().SetOrdered(false))
 	if err != nil {
-		return xerrors.Errorf("trendRepo BatchUpsert db.BulkWrite error : %w", err)
+		return xerrors.Errorf("trendRepo BatchInsert db.BulkWrite error : %w", err)
+	}
+
+	return nil
+}
+
+func (repo *trendRepo) BatchUpdate(ctx context.Context, db *mongo.Collection, data []*po.Trend, inDbMap map[string]*po.Trend) error {
+	writeModels := make([]mongo.WriteModel, 0, len(data))
+
+	for _, trend := range data {
+		toUpdate := trend.ToUpdate(inDbMap[trend.UID])
+		if len(toUpdate) > 0 {
+			toUpdate["updated_at"] = time.Now()
+			updateModel := mongo.NewUpdateOneModel().
+				SetFilter(bson.M{"_id": trend.ID}).
+				SetUpdate(
+					bson.M{"$set": toUpdate})
+			writeModels = append(writeModels, updateModel)
+		}
+	}
+
+	if len(writeModels) > 0 {
+		_, err := db.BulkWrite(ctx, writeModels, options.BulkWrite().SetOrdered(false))
+		if err != nil {
+			return xerrors.Errorf("trendRepo BatchUpdate db.BulkWrite error : %w", err)
+		}
 	}
 
 	return nil

@@ -25,6 +25,7 @@ func NewAppServer() *appServer {
 			middleware.ProvideResponseMiddleware,
 			middleware.ProvideAuthMiddleware,
 			service.ProviderITrendsSrv,
+			service.ProvideLineSrv,
 			webApp.ProviderITrendsCtrl,
 			webApp.ProvideMessageCtrl,
 			webApp.ProvideController,

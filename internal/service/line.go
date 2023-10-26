@@ -8,6 +8,11 @@ import (
 	"lizard/internal/constant"
 	"lizard/internal/model/bo"
 	"log"
+	"math"
+)
+
+const (
+	MAX_SEND_LENGTH = 5
 )
 
 type IMessageSrv interface {
@@ -33,9 +38,20 @@ func ProvideLineSrv(logger logger.ILogger) IMessageSrv {
 }
 
 func (srv *lineSrv) PushMessage(ctx context.Context, cond *bo.SendMessage) error {
-	_, err := srv.bot.PushMessage(cond.To, cond.Messages...).Do()
-	if err != nil {
-		return xerrors.Errorf("lineSrv PushMessage error : %w\n", err)
+	totalSendLen := len(cond.Messages)
+	interval := int(math.Ceil(float64(totalSendLen) / MAX_SEND_LENGTH))
+
+	for i := 0; i < interval; i++ {
+		var messages []linebot.SendingMessage
+		if len(cond.Messages) < (i+1)*MAX_SEND_LENGTH {
+			messages = cond.Messages[i*MAX_SEND_LENGTH:]
+		} else {
+			messages = cond.Messages[i*MAX_SEND_LENGTH : (i+1)*MAX_SEND_LENGTH]
+		}
+
+		if _, err := srv.bot.PushMessage(cond.To, messages...).Do(); err != nil {
+			return xerrors.Errorf("lineSrv PushMessage error : %w\n", err)
+		}
 	}
 
 	return nil

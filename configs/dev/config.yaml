@@ -1,3 +1,5 @@
+http:
+  baseUrl: "http://localhost:8080"
 log:
   name: "lizard"
   env: "dev"

@@ -11,6 +11,7 @@ import (
 type IConfigEnv interface {
 	GetLogConfig() logger.LogConfig
 	GetDbConfig() DbConfig
+	GetHttpConfig() httpConfig
 }
 
 func ProviderIConfigEnv() IConfigEnv {
@@ -38,10 +39,14 @@ func ProviderIConfigEnv() IConfigEnv {
 }
 
 type configEnv struct {
-	LogConfig logConfig `mapstructure:"log"`
-	DbConfig  DbConfig  `mapstructure:"mongodb"`
+	HttpConfig httpConfig `mapstructure:"http"`
+	LogConfig  logConfig  `mapstructure:"log"`
+	DbConfig   DbConfig   `mapstructure:"mongodb"`
 }
 
+type httpConfig struct {
+	BaseUrl string `mapstructure:"baseUrl"`
+}
 type logConfig struct {
 	Name  string `mapstructure:"name"`
 	Env   string `mapstructure:"env"`
@@ -60,4 +65,8 @@ func (c *configEnv) GetLogConfig() logger.LogConfig {
 
 func (c *configEnv) GetDbConfig() DbConfig {
 	return c.DbConfig
+}
+
+func (c *configEnv) GetHttpConfig() httpConfig {
+	return c.HttpConfig
 }

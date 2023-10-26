@@ -39,7 +39,7 @@ type jobApp struct {
 func (app *jobApp) Init() {
 	app.cron.Use(app.mw.Handle)
 
-	_, err := app.cron.AddScheduleFunc("*/3 * * * * *", app.ctrl.TrendJobCtrl.FetchTrendsAndPush)
+	_, err := app.cron.AddScheduleFunc("* */1 * * * *", app.ctrl.TrendJobCtrl.FetchTrendsAndPushMessage)
 
 	if err != nil {
 		app.logger.Error(xerrors.Errorf("jobApp Init app.cron.AddScheduleFunc error: %w", err))
