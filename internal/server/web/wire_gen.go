@@ -27,7 +27,7 @@ func NewAppServer() *appServer {
 	iTrendRepository := repository.ProvideTrendRepository()
 	iTrendSrv := service.ProviderITrendsSrv(iLogger, iMongoCli, iTrendRepository, iConfigEnv)
 	iMessageSrv := service.ProvideLineSrv(iLogger)
-	iTrendCtrl := web.ProviderITrendsCtrl(iTrendSrv, iMessageSrv)
+	iTrendCtrl := web.ProviderITrendsCtrl(iTrendSrv, iMessageSrv, iConfigEnv)
 	controller := web.ProvideController(iMessageCtrl, iTrendCtrl)
 	iResponseMiddleware := middleware.ProvideResponseMiddleware(iLogger)
 	iAuthMiddleware := middleware.ProvideAuthMiddleware(iLogger)

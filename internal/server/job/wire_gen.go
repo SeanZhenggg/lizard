@@ -27,7 +27,7 @@ func NewJobServer() *jobServer {
 	iMongoCli := mongo.ProvideMongoDbCli(iConfigEnv)
 	iTrendRepository := repository.ProvideTrendRepository()
 	iTrendSrv := service.ProviderITrendsSrv(iLogger, iMongoCli, iTrendRepository, iConfigEnv)
-	iTrendJobCtrl := job.ProviderITrendsJobCtrl(iMessageSrv, iTrendSrv)
+	iTrendJobCtrl := job.ProviderITrendsJobCtrl(iMessageSrv, iTrendSrv, iConfigEnv)
 	controller := job.ProvideJobController(iTrendJobCtrl)
 	iCronJob := cronjob.ProviderCronJob(iLogger)
 	iJobLogMiddleware := middleware.ProvideJobLogMiddleware(iLogger)
