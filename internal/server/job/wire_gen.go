@@ -11,6 +11,7 @@ import (
 	job2 "lizard/internal/app/job"
 	"lizard/internal/config"
 	"lizard/internal/controller/job"
+	"lizard/internal/controller/job/middleware"
 	"lizard/internal/mongo"
 	"lizard/internal/repository"
 	"lizard/internal/service"
@@ -29,7 +30,8 @@ func NewJobServer() *jobServer {
 	iTrendJobCtrl := job.ProviderITrendsJobCtrl(iMessageSrv, iTrendSrv)
 	controller := job.ProvideJobController(iTrendJobCtrl)
 	iCronJob := cronjob.ProviderCronJob(iLogger)
-	iJobApp := job2.ProvideJobApp(controller, iCronJob, iLogger)
+	iJobLogMiddleware := middleware.ProvideJobLogMiddleware(iLogger)
+	iJobApp := job2.ProvideJobApp(controller, iCronJob, iLogger, iJobLogMiddleware)
 	jobJobServer := &jobServer{
 		iJobApp: iJobApp,
 	}
