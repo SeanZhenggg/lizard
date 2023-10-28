@@ -12,6 +12,7 @@ type IConfigEnv interface {
 	GetLogConfig() logger.LogConfig
 	GetDbConfig() DbConfig
 	GetHttpConfig() httpConfig
+	GetCronConfig() cronConfig
 }
 
 func ProviderIConfigEnv() IConfigEnv {
@@ -42,11 +43,13 @@ type configEnv struct {
 	HttpConfig httpConfig `mapstructure:"http"`
 	LogConfig  logConfig  `mapstructure:"log"`
 	DbConfig   DbConfig   `mapstructure:"mongodb"`
+	CronConfig cronConfig `mapstructure:"cronjob"`
 }
 
 type httpConfig struct {
 	BaseUrl string `mapstructure:"baseUrl"`
 }
+
 type logConfig struct {
 	Name  string `mapstructure:"name"`
 	Env   string `mapstructure:"env"`
@@ -59,6 +62,10 @@ type DbConfig struct {
 	DbName string `mapstructure:"dbName"`
 }
 
+type cronConfig struct {
+	FetchTrendsAndPushMessage string `mapstructure:"fetch_trends_and_push_message"`
+}
+
 func (c *configEnv) GetLogConfig() logger.LogConfig {
 	return logger.LogConfig(c.LogConfig)
 }
@@ -69,4 +76,8 @@ func (c *configEnv) GetDbConfig() DbConfig {
 
 func (c *configEnv) GetHttpConfig() httpConfig {
 	return c.HttpConfig
+}
+
+func (c *configEnv) GetCronConfig() cronConfig {
+	return c.CronConfig
 }

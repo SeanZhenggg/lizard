@@ -8,3 +8,5 @@ mongodb:
   host: "localhost"
   port: 27017
   dbName: "lizard"
+cron:
+  fetch_trends_and_push_message: "0 0 * * * *"
