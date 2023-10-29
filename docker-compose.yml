@@ -1,12 +1,22 @@
 services:
-  db:
-    image: mongo
-    container_name: mongo
-    restart: always
+  server:
+    image: golang:1.21-alpine
+    container_name: "lizard"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: mongopw
+      APP_ENV: "dev"
     volumes:
-      - ./mongodb/init.js:/docker-entrypoint-initdb.d/init.js
+      - .:/go/src/lizard
+    working_dir: /go/src/lizard
+    command:
+      - /bin/sh
+      - -c
+      - |
+        go build -o ./main ./cmd/web
+        mv ./main /bin
+        /bin/main
     ports:
-    - 27017:27017
+      - 3001:3000
+    networks:
+      - web_service
+networks:
+  web_service:
