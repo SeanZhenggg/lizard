@@ -23,7 +23,7 @@ import (
 func NewJobServer() *jobServer {
 	iConfigEnv := config.ProviderIConfigEnv()
 	iLogger := logger.ProviderILogger(iConfigEnv)
-	iMessageSrv := service.ProvideLineSrv(iLogger)
+	iMessageSrv := service.ProvideMessageSrv(iLogger)
 	iMongoCli := mongo.ProvideMongoDbCli(iConfigEnv)
 	iTrendRepository := repository.ProvideTrendRepository()
 	iTrendSrv := service.ProviderITrendsSrv(iLogger, iMongoCli, iTrendRepository, iConfigEnv)
@@ -31,7 +31,7 @@ func NewJobServer() *jobServer {
 	controller := job.ProvideJobController(iTrendJobCtrl)
 	iCronJob := cronjob.ProviderCronJob(iLogger)
 	iJobLogMiddleware := middleware.ProvideJobLogMiddleware(iLogger)
-	iJobApp := job2.ProvideJobApp(controller, iCronJob, iLogger, iJobLogMiddleware)
+	iJobApp := job2.ProvideJobApp(controller, iCronJob, iLogger, iJobLogMiddleware, iConfigEnv)
 	jobJobServer := &jobServer{
 		iJobApp: iJobApp,
 	}

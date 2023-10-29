@@ -24,7 +24,7 @@ type lineSrv struct {
 	logger logger.ILogger
 }
 
-func ProvideLineSrv(logger logger.ILogger) IMessageSrv {
+func ProvideMessageSrv(logger logger.ILogger) IMessageSrv {
 	bot, err := linebot.New(constant.ChannelSecret, constant.ChannelAccessToken)
 	if err != nil {
 		log.Fatal(xerrors.Errorf("CreateNewBot error : %w", err))

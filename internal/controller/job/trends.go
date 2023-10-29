@@ -29,16 +29,16 @@ type trendJobCtrl struct {
 	cfg        config.IConfigEnv
 }
 
-func (t *trendJobCtrl) FetchTrendsAndPushMessage(ctx *cronjob.Context) {
+func (ctrl *trendJobCtrl) FetchTrendsAndPushMessage(ctx *cronjob.Context) {
 	defer SetJobFunc(ctx)
 
-	data, err := t.trendSrv.FetchTrends(ctx)
+	data, err := ctrl.trendSrv.FetchTrends(ctx)
 	if err != nil {
 		SetJobError(ctx, err)
 		return
 	}
 
-	newInserted, err := t.trendSrv.UpsertTrends(ctx, data)
+	newInserted, err := ctrl.trendSrv.UpsertTrends(ctx, data)
 	if err != nil {
 		SetJobError(ctx, err)
 		return
@@ -48,7 +48,7 @@ func (t *trendJobCtrl) FetchTrendsAndPushMessage(ctx *cronjob.Context) {
 	for _, r := range newInserted {
 		tRes := dto.TrendResponse{
 			Keyword:  r.Title,
-			ShortUrl: t.cfg.GetHttpConfig().BaseUrl + "/" + r.ShortUrl,
+			ShortUrl: ctrl.cfg.GetHttpConfig().BaseUrl + "/r/" + r.ShortUrl,
 			SendTime: r.UpdatedAt.Format(time.DateTime),
 		}
 		messages = append(messages, linebot.NewTextMessage(tRes.Message()))
@@ -58,7 +58,7 @@ func (t *trendJobCtrl) FetchTrendsAndPushMessage(ctx *cronjob.Context) {
 		To:       constant.GroupId,
 		Messages: messages,
 	}
-	err = t.messageSrv.PushMessage(ctx, cond)
+	err = ctrl.messageSrv.PushMessage(ctx, cond)
 	if err != nil {
 		SetJobError(ctx, err)
 		return

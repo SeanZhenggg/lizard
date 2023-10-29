@@ -19,6 +19,7 @@ import (
 type ITrendSrv interface {
 	FetchTrends(ctx context.Context) ([]*po.Trend, error)
 	UpsertTrends(ctx context.Context, data []*po.Trend) ([]*po.Trend, error)
+	GetTrendByUrl(ctx context.Context, url string) (*po.Trend, error)
 }
 
 func ProviderITrendsSrv(logger logger.ILogger, db mongo.IMongoCli, repo repository.ITrendRepository, config config.IConfigEnv) ITrendSrv {
@@ -37,29 +38,24 @@ type trendSrv struct {
 	cfg    config.IConfigEnv
 }
 
-func (t *trendSrv) FetchTrends(ctx context.Context) ([]*po.Trend, error) {
-	client := request.NewClient(t.logger)
+func (srv *trendSrv) FetchTrends(ctx context.Context) ([]*po.Trend, error) {
+	client := request.NewClient(srv.logger)
 
-	response, err := client.HttpGet(constant.GoogleDailyTrendUrl, map[string]string{
-		"hl":  "zh-TW",
-		"tz":  "-480",
-		"geo": "TW",
-		"ns":  "15",
-	}, nil)
+	response, err := client.HttpGet(constant.GoogleDailyTrendApiDomain, constant.DailyTrendApiReqParams, nil)
 	if err != nil {
-		return nil, xerrors.Errorf("trendsSrv FetchTrends client.HttpGet error: %w", err)
+		return nil, xerrors.Errorf("trendsSrv FetchTrendsAndPushMessage client.HttpGet error: %w", err)
 	}
 
 	re, err := regexp.Compile(`{"default":{(.*?)}}`)
 	if err != nil {
-		return nil, xerrors.Errorf("trendsSrv FetchTrends regexp.Compile error: %w", err)
+		return nil, xerrors.Errorf("trendsSrv FetchTrendsAndPushMessage regexp.Compile error: %w", err)
 	}
 
 	matched := re.FindString(string(response))
 
 	trend := &bo.DailyTrends{}
 	if err := json.Unmarshal([]byte(matched), trend); err != nil {
-		return nil, xerrors.Errorf("trendsSrv FetchTrends json unmarshal error: %w", err)
+		return nil, xerrors.Errorf("trendsSrv FetchTrendsAndPushMessage json unmarshal error: %w", err)
 	}
 
 	if trend.Default == nil {
@@ -94,11 +90,11 @@ func (t *trendSrv) FetchTrends(ctx context.Context) ([]*po.Trend, error) {
 	return poTrends, nil
 }
 
-func (t *trendSrv) UpsertTrends(ctx context.Context, data []*po.Trend) ([]*po.Trend, error) {
-	db := t.db.GetCollection(ctx, "trends")
-	aiIdInfo, err := t.repo.GetMaxAiIDInfo(ctx, db)
+func (srv *trendSrv) UpsertTrends(ctx context.Context, data []*po.Trend) ([]*po.Trend, error) {
+	db := srv.db.GetCollection(ctx, "trends")
+	aiIdInfo, err := srv.repo.GetMaxAiIDInfo(ctx, db)
 	if err != nil {
-		return nil, xerrors.Errorf("trendsSrv t.repo.GetMaxAiIDInfo error : %w", err)
+		return nil, xerrors.Errorf("trendsSrv srv.repo.GetMaxAiIDInfo error : %w", err)
 	}
 
 	var nextAiID int64
@@ -111,9 +107,9 @@ func (t *trendSrv) UpsertTrends(ctx context.Context, data []*po.Trend) ([]*po.Tr
 	for _, search := range data {
 		search.UID = search.GenUID()
 	}
-	trendsInDb, err := t.repo.GetMatchedExistedTrends(ctx, db, data)
+	trendsInDb, err := srv.repo.GetMatchedExistedTrends(ctx, db, data)
 	if err != nil {
-		return nil, xerrors.Errorf("trendsSrv t.repo.GetMatchedExistedTrends error : %w", err)
+		return nil, xerrors.Errorf("trendsSrv srv.repo.GetMatchedExistedTrends error : %w", err)
 	}
 
 	trendsInDbMap := make(map[string]*po.Trend)
@@ -140,19 +136,30 @@ func (t *trendSrv) UpsertTrends(ctx context.Context, data []*po.Trend) ([]*po.Tr
 
 	// for insert
 	if len(insertTrends) > 0 {
-		err = t.repo.BatchInsert(ctx, db, insertTrends)
+		err = srv.repo.BatchInsert(ctx, db, insertTrends)
 		if err != nil {
-			return nil, xerrors.Errorf("trendsSrv t.repo.BatchInsert error : %w", err)
+			return nil, xerrors.Errorf("trendsSrv srv.repo.BatchInsert error : %w", err)
 		}
 	}
 
 	// for update
 	if len(updateTrends) > 0 {
-		err = t.repo.BatchUpdate(ctx, db, updateTrends, trendsInDbMap)
+		err = srv.repo.BatchUpdate(ctx, db, updateTrends, trendsInDbMap)
 		if err != nil {
-			return nil, xerrors.Errorf("trendsSrv t.repo.BatchUpdate error : %w", err)
+			return nil, xerrors.Errorf("trendsSrv srv.repo.BatchUpdate error : %w", err)
 		}
 	}
 
 	return insertTrends, nil
+}
+
+func (srv *trendSrv) GetTrendByUrl(ctx context.Context, url string) (*po.Trend, error) {
+	db := srv.db.GetCollection(ctx, "trends")
+	cond := &po.TrendUrlCond{ShortUrl: url}
+	trend, err := srv.repo.GetTrendByUrl(ctx, db, cond)
+	if err != nil {
+		return nil, xerrors.Errorf("trendsSrv srv.repo.GetTrendByUrl error : %w", err)
+	}
+
+	return trend, nil
 }

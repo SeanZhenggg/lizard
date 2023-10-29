@@ -24,8 +24,9 @@ func (job *jobServer) Run() {
 
 	select {
 	case <-interrupt:
-		ctx := job.iJobApp.Stop()
 		log.Printf("gracefully shutdown the job service...")
+		ctx := job.iJobApp.Stop()
 		<-ctx.Done()
+		log.Printf("service shutted down.")
 	}
 }

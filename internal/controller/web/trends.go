@@ -8,12 +8,14 @@ import (
 	"lizard/internal/model/bo"
 	"lizard/internal/model/dto"
 	"lizard/internal/service"
+	"lizard/internal/utils/errs"
 	"net/http"
 	"time"
 )
 
 type ITrendCtrl interface {
-	FetchTrends(ctx *gin.Context)
+	FetchTrendsAndPushMessage(ctx *gin.Context)
+	RedirectToTrendPage(ctx *gin.Context)
 }
 
 func ProviderITrendsCtrl(trendSrv service.ITrendSrv, messageSrv service.IMessageSrv, cfg config.IConfigEnv) ITrendCtrl {
@@ -31,16 +33,16 @@ type trendCtrl struct {
 	SetResponse *StandardResponse
 }
 
-func (t *trendCtrl) FetchTrends(ctx *gin.Context) {
-	data, err := t.trendSrv.FetchTrends(ctx)
+func (ctrl *trendCtrl) FetchTrendsAndPushMessage(ctx *gin.Context) {
+	data, err := ctrl.trendSrv.FetchTrends(ctx)
 	if err != nil {
-		t.SetResponse.SetStandardResponse(ctx, http.StatusBadRequest, err)
+		ctrl.SetResponse.SetStandardResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
 
-	newInserted, err := t.trendSrv.UpsertTrends(ctx, data)
+	newInserted, err := ctrl.trendSrv.UpsertTrends(ctx, data)
 	if err != nil {
-		t.SetResponse.SetStandardResponse(ctx, http.StatusBadRequest, err)
+		ctrl.SetResponse.SetStandardResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
 
@@ -48,7 +50,7 @@ func (t *trendCtrl) FetchTrends(ctx *gin.Context) {
 	for _, r := range newInserted {
 		tRes := dto.TrendResponse{
 			Keyword:  r.Title,
-			ShortUrl: t.cfg.GetHttpConfig().BaseUrl + "/" + r.ShortUrl,
+			ShortUrl: ctrl.cfg.GetHttpConfig().BaseUrl + "/" + r.ShortUrl,
 			SendTime: r.UpdatedAt.Format(time.DateTime),
 		}
 		messages = append(messages, linebot.NewTextMessage(tRes.Message()))
@@ -58,11 +60,34 @@ func (t *trendCtrl) FetchTrends(ctx *gin.Context) {
 		To:       constant.GroupId,
 		Messages: messages,
 	}
-	err = t.messageSrv.PushMessage(ctx, cond)
+	err = ctrl.messageSrv.PushMessage(ctx, cond)
 	if err != nil {
-		t.SetResponse.SetStandardResponse(ctx, http.StatusBadRequest, err)
+		ctrl.SetResponse.SetStandardResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
 
-	t.SetResponse.SetStandardResponse(ctx, http.StatusOK, messages)
+	ctrl.SetResponse.SetStandardResponse(ctx, http.StatusOK, messages)
+}
+
+func (ctrl *trendCtrl) RedirectToTrendPage(ctx *gin.Context) {
+	var cond dto.TrendPathCond
+	err := ctx.ShouldBindUri(&cond)
+	if err != nil {
+		ctrl.SetResponse.SetStandardResponse(ctx, http.StatusBadRequest, errs.CommonErr.RequestParamError)
+		return
+	}
+
+	matchedTrend, err := ctrl.trendSrv.GetTrendByUrl(ctx, cond.Path)
+	if err != nil {
+		ctrl.SetResponse.SetStandardResponse(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	defer ctx.Abort()
+	if matchedTrend == nil {
+		ctx.Redirect(http.StatusFound, constant.DefaultGoogleDailyTrendUrl)
+		return
+	}
+
+	ctx.Redirect(http.StatusFound, matchedTrend.ShareUrl)
 }

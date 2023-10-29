@@ -26,12 +26,11 @@ func NewAppServer() *appServer {
 	iMongoCli := mongo.ProvideMongoDbCli(iConfigEnv)
 	iTrendRepository := repository.ProvideTrendRepository()
 	iTrendSrv := service.ProviderITrendsSrv(iLogger, iMongoCli, iTrendRepository, iConfigEnv)
-	iMessageSrv := service.ProvideLineSrv(iLogger)
+	iMessageSrv := service.ProvideMessageSrv(iLogger)
 	iTrendCtrl := web.ProviderITrendsCtrl(iTrendSrv, iMessageSrv, iConfigEnv)
 	controller := web.ProvideController(iMessageCtrl, iTrendCtrl)
 	iResponseMiddleware := middleware.ProvideResponseMiddleware(iLogger)
-	iAuthMiddleware := middleware.ProvideAuthMiddleware(iLogger)
-	iWebApp := web2.ProvideWebApp(controller, iResponseMiddleware, iAuthMiddleware)
+	iWebApp := web2.ProvideWebApp(controller, iResponseMiddleware)
 	webAppServer := &appServer{
 		iWebApp: iWebApp,
 	}

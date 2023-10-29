@@ -19,3 +19,9 @@ type SendMessage struct {
 	To       string
 	Messages []linebot.SendingMessage
 }
+
+type LineResponse struct {
+	Raw     string `json:"raw"`
+	Source  string `json:"source"`
+	Message string `json:"message"`
+}

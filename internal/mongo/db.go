@@ -32,10 +32,10 @@ func ProvideMongoDbCli(config config.IConfigEnv) IMongoCli {
 
 func dbConnect(dbConfig config.DbConfig) *mongo.Database {
 	credential := options.Credential{
-		Username: "root",
-		Password: "mongopw",
+		Username: dbConfig.Account,
+		Password: dbConfig.Password,
 	}
-	log.Printf("Connecting to %s", fmt.Sprintf(
+	log.Printf("CONNECTING TO %s", fmt.Sprintf(
 		"mongodb://%s:%s",
 		dbConfig.Host,
 		dbConfig.Port,
@@ -46,7 +46,7 @@ func dbConnect(dbConfig config.DbConfig) *mongo.Database {
 		dbConfig.Port,
 	)).
 		SetAuth(credential).
-		SetMaxPoolSize(20).
+		SetMaxPoolSize(dbConfig.MaxPoolSize).
 		SetWriteConcern(writeconcern.New(writeconcern.WMajority()))
 
 	// 建立连接

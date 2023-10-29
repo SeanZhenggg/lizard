@@ -27,7 +27,7 @@ func NewJobServer() *jobServer {
 			jobMw.ProvideJobLogMiddleware,
 			repository.ProvideTrendRepository,
 			service.ProviderITrendsSrv,
-			service.ProvideLineSrv,
+			service.ProvideMessageSrv,
 			jobCtrl.ProviderITrendsJobCtrl,
 			jobCtrl.ProvideJobController,
 			mongo.ProvideMongoDbCli,

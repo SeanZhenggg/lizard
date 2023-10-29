@@ -28,6 +28,10 @@ type TrendMaxAiID struct {
 	AiID int64 `bson:"ai_id"`
 }
 
+type TrendUrlCond struct {
+	ShortUrl string `bson:"short_url"`
+}
+
 func (t *Trend) GenUID() string {
 	return fmt.Sprintf("%s_%s_%s", t.Date, t.Title, t.ShareUrl)
 }

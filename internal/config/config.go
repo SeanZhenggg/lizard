@@ -57,9 +57,12 @@ type logConfig struct {
 }
 
 type DbConfig struct {
-	Host   string `mapstructure:"host"`
-	Port   string `mapstructure:"port"`
-	DbName string `mapstructure:"dbName"`
+	Host        string `mapstructure:"host"`
+	Port        string `mapstructure:"port"`
+	DbName      string `mapstructure:"dbName"`
+	Account     string `mapstructure:"account"`
+	Password    string `mapstructure:"password"`
+	MaxPoolSize uint64 `mapstructure:"max_pool_size"`
 }
 
 type cronConfig struct {

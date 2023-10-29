@@ -17,6 +17,7 @@ type ITrendRepository interface {
 	GetMatchedExistedTrends(ctx context.Context, db *mongo.Collection, data []*po.Trend) ([]*po.Trend, error)
 	BatchInsert(ctx context.Context, db *mongo.Collection, data []*po.Trend) error
 	BatchUpdate(ctx context.Context, db *mongo.Collection, data []*po.Trend, inDbMap map[string]*po.Trend) error
+	GetTrendByUrl(ctx context.Context, db *mongo.Collection, cond *po.TrendUrlCond) (*po.Trend, error)
 }
 
 func ProvideTrendRepository() ITrendRepository {
@@ -109,4 +110,17 @@ func (repo *trendRepo) BatchUpdate(ctx context.Context, db *mongo.Collection, da
 	}
 
 	return nil
+}
+
+func (repo *trendRepo) GetTrendByUrl(ctx context.Context, db *mongo.Collection, cond *po.TrendUrlCond) (*po.Trend, error) {
+	var res *po.Trend
+	if err := db.FindOne(ctx, cond).Decode(&res); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+
+		return nil, xerrors.Errorf("trendRepo GetTrendByUrl FindOne error : %w", err)
+	}
+
+	return res, nil
 }

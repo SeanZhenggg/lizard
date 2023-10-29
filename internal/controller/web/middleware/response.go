@@ -28,16 +28,20 @@ type respMiddleware struct {
 	logger logger.ILogger
 }
 
-func (respMw *respMiddleware) Handle(ctx *gin.Context) {
+func (mw *respMiddleware) Handle(ctx *gin.Context) {
 	// before request
 
 	ctx.Next()
 
 	// after request
-	respMw.standardResponse(ctx)
+	if ctx.IsAborted() {
+		return
+	}
+
+	mw.standardResponse(ctx)
 }
 
-func (respMw *respMiddleware) generateStandardResponse(ctx *gin.Context) response {
+func (mw *respMiddleware) generateStandardResponse(ctx *gin.Context) response {
 	status := ctx.GetInt(RespStatus)
 	data := ctx.MustGet(RespData)
 	var code int
@@ -55,7 +59,7 @@ func (respMw *respMiddleware) generateStandardResponse(ctx *gin.Context) respons
 			}
 			data = nil
 
-			respMw.logger.Error(err)
+			mw.logger.Error(err)
 		}
 	}
 
@@ -66,8 +70,8 @@ func (respMw *respMiddleware) generateStandardResponse(ctx *gin.Context) respons
 	}
 }
 
-func (respMw *respMiddleware) standardResponse(ctx *gin.Context) {
-	response := respMw.generateStandardResponse(ctx)
+func (mw *respMiddleware) standardResponse(ctx *gin.Context) {
+	response := mw.generateStandardResponse(ctx)
 
 	respStatus := ctx.GetInt(RespStatus)
 

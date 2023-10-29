@@ -27,20 +27,20 @@ type logMiddleware struct {
 	logger logger.ILogger
 }
 
-func (logMw *logMiddleware) Handle(ctx *cronjob.Context) {
+func (mw *logMiddleware) Handle(ctx *cronjob.Context) {
 	// before request
 	defer log.CallTotalDurationLog(func(spentTime string) {
 		funcName, _ := ctx.Get(LogFuncName)
-		logMw.logger.Info(fmt.Sprintf("job func \"%s\" execution completed, total duration : %s", funcName, spentTime))
+		mw.logger.Info(fmt.Sprintf("job func \"%s\" execution completed, total duration : %s", funcName, spentTime))
 	})()
 
 	ctx.Next()
 
 	// after request
-	logMw.log(ctx)
+	mw.log(ctx)
 }
 
-func (logMw *logMiddleware) log(ctx *cronjob.Context) {
+func (mw *logMiddleware) log(ctx *cronjob.Context) {
 	data, existed := ctx.Get(LogError)
 
 	if !existed {
@@ -48,7 +48,7 @@ func (logMw *logMiddleware) log(ctx *cronjob.Context) {
 	}
 
 	if err, ok := data.(error); ok {
-		logMw.logger.Error(err)
+		mw.logger.Error(err)
 	}
 }
 
