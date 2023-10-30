@@ -5,11 +5,12 @@ log:
   env: "dev"
   level: "debug"
 mongodb:
-  host: "localhost"
+#  host: "localhost"
+  host: "db"
   port: 27017
   dbName: "lizard"
   account: "root"
   password: "mongopw"
   max_pool_size: 20
 cronjob:
-  fetch_trends_and_push_message: "0 15 * * * *"
+  fetch_trends_and_push_message: "0 0 * * * *"

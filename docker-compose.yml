@@ -7,9 +7,22 @@ services:
     volumes:
       - .:/go/src/lizard
     working_dir: /go/src/lizard
+    restart: always
     command: /bin/sh -c "go build -o ./main ./cmd/web && ./main"
     ports:
-      - 3001:3000
+      - 3000:8080
+    networks:
+      - web_service
+  job:
+    image: golang:1.21-alpine
+    container_name: "lizard-job"
+    environment:
+      APP_ENV: "dev"
+    volumes:
+      - .:/go/src/lizard
+    working_dir: /go/src/lizard
+    restart: always
+    command: /bin/sh -c "go build -o ./main ./cmd/job && ./main"
     networks:
       - web_service
 
@@ -24,6 +37,7 @@ services:
       - ./mongodb/init.js:/docker-entrypoint-initdb.d/init.js
     ports:
       - 27017:27017
-
+    networks:
+      - web_service
 networks:
   web_service:
