@@ -103,7 +103,7 @@ VOLUME /data/db /data/configdb
 ENV HOME /data/db
 
 COPY docker-entrypoint.sh /usr/local/bin/
-ENTRYPOINT ["./mongodb/docker-entrypoint.sh"]
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 EXPOSE 27017
 CMD ["mongod"]
