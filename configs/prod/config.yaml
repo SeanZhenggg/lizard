@@ -1,0 +1,15 @@
+http:
+  baseUrl: "http://lizard.seansz.com"
+log:
+  name: "lizard"
+  env: "prod"
+  level: "debug"
+mongodb:
+  host: "db"
+  port: 27017
+  dbName: "lizard"
+  account: "seanzheng"
+  password: "1qaz@WSX"
+  max_pool_size: 20
+cronjob:
+  fetch_trends_and_push_message: "0 0 * * * *"

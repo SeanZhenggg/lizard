@@ -1,9 +1,9 @@
 services:
   server:
     image: golang:1.21-alpine
-    container_name: "lizard"
+    container_name: lizard-api
     environment:
-      APP_ENV: "dev"
+      APP_ENV: "prod"
     volumes:
       - .:/go/src/lizard
     working_dir: /go/src/lizard
@@ -13,11 +13,12 @@ services:
       - 3000:8080
     networks:
       - web_service
+
   job:
     image: golang:1.21-alpine
-    container_name: "lizard-job"
+    container_name: lizard-job
     environment:
-      APP_ENV: "dev"
+      APP_ENV: "prod"
     volumes:
       - .:/go/src/lizard
     working_dir: /go/src/lizard
@@ -27,12 +28,13 @@ services:
       - web_service
 
   db:
-    image: mongo
-    container_name: mongo
+    build:
+      context: ./mongodb
+    container_name: lizard-mongo
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: mongopw
+      MONGO_INITDB_ROOT_USERNAME: seanzheng
+      MONGO_INITDB_ROOT_PASSWORD: "1qaz@WSX"
     volumes:
       - ./mongodb/init.js:/docker-entrypoint-initdb.d/init.js
     ports:
