@@ -1,6 +1,7 @@
+version: 2
 authtoken: 20MxC71ZYt9Tcdxc7sNSQtbgfRT_3PejXgijXA6U4BSFq3Fs
 tunnels:
   lizard-tls:
-    proto: tls
+    proto: http
     domain: merely-united-heron.ngrok-free.app
     addr: lizard-api:8080

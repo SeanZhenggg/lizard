@@ -54,6 +54,8 @@ services:
       - ./build/ngrok/ngrok.yml:/etc/ngrok.yml
     ports:
       - 4040:4040
+    networks:
+      - web_service
 
 networks:
   web_service:
