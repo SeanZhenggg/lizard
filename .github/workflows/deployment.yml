@@ -9,7 +9,7 @@ jobs:
       - name: Checkout main branch
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: master
       - name: transfer code to server via SFTP
         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
