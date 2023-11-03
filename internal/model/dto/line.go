@@ -6,13 +6,14 @@ import (
 )
 
 type TrendResponse struct {
-	Keyword  string
-	ShortUrl string
-	SendTime string
+	Keyword       string
+	ShortUrl      string
+	SendTime      string
+	SearchTraffic string
 }
 
 func (tr TrendResponse) Message() string {
-	return fmt.Sprintf("關鍵字：%s\n\n網址：%s\n\n%s", tr.Keyword, tr.ShortUrl, tr.SendTime)
+	return fmt.Sprintf("關鍵字：%s\n\n網址：%s\n\n搜尋量：%s\n\n%s", tr.Keyword, tr.ShortUrl, tr.SearchTraffic, tr.SendTime)
 }
 
 type SendMessage struct {

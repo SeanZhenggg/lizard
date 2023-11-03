@@ -49,9 +49,10 @@ func (ctrl *trendCtrl) FetchTrendsAndPushMessage(ctx *gin.Context) {
 	messages := make([]linebot.SendingMessage, 0, len(newInserted))
 	for _, r := range newInserted {
 		tRes := dto.TrendResponse{
-			Keyword:  r.Title,
-			ShortUrl: ctrl.cfg.GetHttpConfig().BaseUrl + "/" + r.ShortUrl,
-			SendTime: r.UpdatedAt.Format(time.DateTime),
+			Keyword:       r.Title,
+			ShortUrl:      ctrl.cfg.GetHttpConfig().BaseUrl + "/" + r.ShortUrl,
+			SendTime:      r.UpdatedAt.Format(time.DateTime),
+			SearchTraffic: r.FormattedTraffic,
 		}
 		messages = append(messages, linebot.NewTextMessage(tRes.Message()))
 	}
