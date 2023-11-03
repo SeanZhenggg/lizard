@@ -7,7 +7,7 @@ services:
     volumes:
       - .:/go/src/lizard
     working_dir: /go/src/lizard
-    restart: always
+    restart: unless-stopped
     command: /bin/sh -c "go build -o ./main ./cmd/web && ./main"
     ports:
       - 3000:8080
@@ -22,24 +22,38 @@ services:
     volumes:
       - .:/go/src/lizard
     working_dir: /go/src/lizard
-    restart: always
+    restart: unless-stopped
     command: /bin/sh -c "go build -o ./main ./cmd/job && ./main"
     networks:
       - web_service
 
   db:
     build:
-      context: ./mongodb
+      context: build/mongodb
     container_name: lizard-mongo
-    restart: always
+    restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: seanzheng
       MONGO_INITDB_ROOT_PASSWORD: "1qaz@WSX"
     volumes:
-      - ./mongodb/init.js:/docker-entrypoint-initdb.d/init.js
+      - ./build/mongodb/init.js:/docker-entrypoint-initdb.d/init.js
     ports:
       - 27017:27017
     networks:
       - web_service
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    command:
+      - "start"
+      - "--all"
+      - "--config"
+      - "/etc/ngrok.yml"
+    volumes:
+      - ./build/ngrok/ngrok.yml:/etc/ngrok.yml
+    ports:
+      - 4040:4040
+
 networks:
   web_service:
