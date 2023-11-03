@@ -17,7 +17,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           host: ${{ secrets.HOST }}
           port: ${{ secrets.FTP_PORT }}
-          localDir: './*'
+          localDir: '.'
           remoteDir: ${{ vars.REMOTE_PATH }}
           exclude: vendor/
       - name: run docker compose
