@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - main
+      - master
 jobs:
   deployment:
     runs-on: ubuntu-latest
@@ -28,6 +28,6 @@ jobs:
             username: ${{ secrets.USERNAME }}
             password: ${{ secrets.PASSWORD }}
             script: |
-              docker stop $(docker ps -a | awk '/lizard-/ {print $1;}')
-              docker rm $(docker ps -a | awk '/lizard-/ {print $1;}')
+              test -z "$(docker ps -a | awk '/lizard-/ {print $1;}')" && docker stop $(docker ps -a | awk '/lizard-/ {print $1;}') 
+              test -z "$(docker ps -a | awk '/lizard-/ {print $1;}')" && docker rm $(docker ps -a | awk '/lizard-/ {print $1;}')
               docker compose up -d
