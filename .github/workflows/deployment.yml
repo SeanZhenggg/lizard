@@ -21,8 +21,8 @@ jobs:
           sftp_only: true
           password: ${{ secrets.FTP_PASSWORD }}
       - name: run docker compose
-        uses:
-          with:
+        uses: appleboy/ssh-action@v1.0.0
+        with:
             host: ${{ secrets.HOST }}
             port: ${{ secrets.PORT }}
             username: ${{ secrets.USERNAME }}
