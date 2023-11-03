@@ -11,15 +11,15 @@ jobs:
         with:
           ref: master
       - name: transfer code to server via SFTP
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        uses: wangyucode/sftp-upload-action@v2.0.2
         with:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
-          server: ${{ secrets.HOST }}
+          host: ${{ secrets.HOST }}
           port: ${{ secrets.FTP_PORT }}
-          local_path: './*'
-          remote_path: ${{ vars.REMOTE_PATH }}
-          sftp_only: true
+          localDir: './*'
+          remoteDir: ${{ vars.REMOTE_PATH }}
+          exclude: vendor/
       - name: run docker compose
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -28,6 +28,6 @@ jobs:
             username: ${{ secrets.USERNAME }}
             password: ${{ secrets.PASSWORD }}
             script: |
-              test -z "$(docker ps -a | awk '/lizard-/ {print $1;}')" && docker stop $(docker ps -a | awk '/lizard-/ {print $1;}') 
-              test -z "$(docker ps -a | awk '/lizard-/ {print $1;}')" && docker rm $(docker ps -a | awk '/lizard-/ {print $1;}')
+              test -n "$(docker ps -a | awk '/lizard-/ {print $1;}')" && docker stop $(docker ps -a | awk '/lizard-/ {print $1;}') 
+              test -n "$(docker ps -a | awk '/lizard-/ {print $1;}')" && docker rm $(docker ps -a | awk '/lizard-/ {print $1;}')
               docker compose up -d
