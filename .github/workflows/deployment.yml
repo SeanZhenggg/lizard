@@ -26,4 +26,6 @@ jobs:
             port: ${{ secrets.SSH_PORT }}
             username: ${{ secrets.USERNAME }}
             password: ${{ secrets.PASSWORD }}
-            script: docker compose -f docker-compose.yml up -d
+            script: |
+              cd /home/seanzheng/sean/side_project/lizard
+              docker compose -f docker-compose.yml up -d
