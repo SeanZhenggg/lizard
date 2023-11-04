@@ -19,6 +19,7 @@ jobs:
           port: ${{ secrets.FTP_PORT }}
           local_path: '.'
           remote_path: '/home/seanzheng/sean/side_project/lizard'
+          delete_remote_files: true
       - name: run docker compose
         uses: appleboy/ssh-action@v1.0.0
         with:
