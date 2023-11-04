@@ -6,9 +6,13 @@ services:
       APP_ENV: "prod"
     volumes:
       - .:/go/src/lizard
+      - ~/.ssh:/root/.ssh:ro
+      - "$HOME"/.gitconfig:/root/.gitconfig
     working_dir: /go/src/lizard
-    restart: unless-stopped
-    command: /bin/sh -c "go build -o ./main ./cmd/web && ./main"
+    restart: no
+    tty: true
+    stdin_open: true
+    command: /bin/sh scripts/deploy-web.sh
     ports:
       - 3000:8080
     networks:
@@ -21,9 +25,11 @@ services:
       APP_ENV: "prod"
     volumes:
       - .:/go/src/lizard
+      - ~/.ssh:/root/.ssh:ro
+      - "$HOME"/.gitconfig:/root/.gitconfig
     working_dir: /go/src/lizard
     restart: unless-stopped
-    command: /bin/sh -c "go build -o ./main ./cmd/job && ./main"
+    command: /bin/sh scripts/deploy-job.sh
     networks:
       - web_service
 
