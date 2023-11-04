@@ -7,11 +7,9 @@ services:
     volumes:
       - .:/go/src/lizard
       - ~/.ssh:/root/.ssh:ro
-      - "$HOME"/.gitconfig:/root/.gitconfig
+      - ~/.gitconfig:/root/.gitconfig
     working_dir: /go/src/lizard
-    restart: no
-    tty: true
-    stdin_open: true
+    restart: unless-stopped
     command: /bin/sh scripts/deploy-web.sh
     ports:
       - 3000:8080
@@ -26,7 +24,7 @@ services:
     volumes:
       - .:/go/src/lizard
       - ~/.ssh:/root/.ssh:ro
-      - "$HOME"/.gitconfig:/root/.gitconfig
+      - ~/.gitconfig:/root/.gitconfig
     working_dir: /go/src/lizard
     restart: unless-stopped
     command: /bin/sh scripts/deploy-job.sh
