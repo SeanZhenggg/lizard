@@ -28,5 +28,9 @@ jobs:
             username: ${{ secrets.USERNAME }}
             password: ${{ secrets.PASSWORD }}
             script: |
-              cd /home/seanzheng/sean/side_project/lizard
+              docker stop $(docker ps -a | awk '/lizard-/ {print $1;}') && docker rm $(docker ps -a | awk '/lizard-/ {print $1;}')
+              cd /home/seanzheng/sean/side_project
+              test -e lizard && rm -rf lizard
+              git clone git@github.com:SeanZhenggg/lizard.git
+              cd lizard
               docker compose -f docker-compose.yml up -d
