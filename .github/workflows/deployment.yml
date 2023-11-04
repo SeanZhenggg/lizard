@@ -31,6 +31,9 @@ jobs:
               docker stop $(docker ps -a | awk '/lizard-/ {print $1;}') && docker rm $(docker ps -a | awk '/lizard-/ {print $1;}')
               cd /home/seanzheng/sean/side_project
               test -e lizard && rm -rf lizard
+              eval `ssh-agent -s`
+              ssh-add ~/.ssh/sean_github_id_ed25519
+              ssh -T git@github.com
               git clone git@github.com:SeanZhenggg/lizard.git
               cd lizard
               docker compose -f docker-compose.yml up -d
