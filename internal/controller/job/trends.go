@@ -49,7 +49,7 @@ func (ctrl *trendJobCtrl) FetchTrendsAndPushMessage(ctx *cronjob.Context) {
 		tRes := dto.TrendResponse{
 			Keyword:       r.Title,
 			ShortUrl:      ctrl.cfg.GetHttpConfig().BaseUrl + "/r/" + r.ShortUrl,
-			SendTime:      r.UpdatedAt.Format(time.DateTime),
+			SendTime:      r.UpdatedAt.Local().Format(time.DateTime),
 			SearchTraffic: r.FormattedTraffic,
 		}
 		messages = append(messages, linebot.NewTextMessage(tRes.Message()))
