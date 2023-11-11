@@ -2,6 +2,7 @@ package job
 
 import (
 	"github.com/line/line-bot-sdk-go/v7/linebot"
+	"golang.org/x/xerrors"
 	"lizard/internal/config"
 	"lizard/internal/constant"
 	"lizard/internal/model/bo"
@@ -44,12 +45,20 @@ func (ctrl *trendJobCtrl) FetchTrendsAndPushMessage(ctx *cronjob.Context) {
 		return
 	}
 
+	var loc *time.Location
+	loc, err = time.LoadLocation("Asia/Taipei")
+	if err != nil {
+		SetJobError(ctx, xerrors.Errorf("trendJobCtrl FetchTrendsAndPushMessage time.LoadLocation error : %w", err))
+		loc = time.UTC
+	}
+
 	messages := make([]linebot.SendingMessage, 0, len(newInserted))
 	for _, r := range newInserted {
+
 		tRes := dto.TrendResponse{
 			Keyword:       r.Title,
 			ShortUrl:      ctrl.cfg.GetHttpConfig().BaseUrl + "/r/" + r.ShortUrl,
-			SendTime:      r.UpdatedAt.Local().Format(time.DateTime),
+			SendTime:      r.UpdatedAt.In(loc).Format(time.DateTime),
 			SearchTraffic: r.FormattedTraffic,
 		}
 		messages = append(messages, linebot.NewTextMessage(tRes.Message()))
