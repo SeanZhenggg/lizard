@@ -12,7 +12,7 @@ services:
     restart: unless-stopped
     command: /bin/sh scripts/deploy-web.sh
     ports:
-      - 3000:8080
+      - 3000:3000
     networks:
       - web_service
 

@@ -48,6 +48,7 @@ type configEnv struct {
 
 type httpConfig struct {
 	BaseUrl string `mapstructure:"baseUrl"`
+	Port    string `mapstructure:"port"`
 }
 
 type logConfig struct {

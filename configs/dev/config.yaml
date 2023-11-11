@@ -1,5 +1,6 @@
 http:
   baseUrl: "http://localhost:8080"
+  port: 3000
 log:
   name: "lizard"
   env: "dev"

@@ -32,7 +32,8 @@ func NewAppServer() *appServer {
 	iResponseMiddleware := middleware.ProvideResponseMiddleware(iLogger)
 	iWebApp := web2.ProvideWebApp(controller, iResponseMiddleware)
 	webAppServer := &appServer{
-		iWebApp: iWebApp,
+		iWebApp:   iWebApp,
+		ConfigEnv: iConfigEnv,
 	}
 	return webAppServer
 }

@@ -1,11 +1,12 @@
 http:
   baseUrl: "http://lizard.seansz.com"
+  port: 3000
 log:
   name: "lizard"
   env: "prod"
   level: "debug"
 mongodb:
-  host: "db"
+  host: "lizard.seansz.com"
   port: 27017
   dbName: "lizard"
   account: "seanzheng"

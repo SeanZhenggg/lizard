@@ -4,4 +4,4 @@ tunnels:
   lizard-tls:
     proto: http
     domain: merely-united-heron.ngrok-free.app
-    addr: lizard-api:8080
+    addr: lizard-api:3000
