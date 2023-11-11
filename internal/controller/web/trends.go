@@ -7,6 +7,7 @@ import (
 	"lizard/internal/constant"
 	"lizard/internal/model/bo"
 	"lizard/internal/model/dto"
+	"lizard/internal/model/po"
 	"lizard/internal/service"
 	"lizard/internal/utils/errs"
 	"net/http"
@@ -16,6 +17,7 @@ import (
 type ITrendCtrl interface {
 	FetchTrendsAndPushMessage(ctx *gin.Context)
 	RedirectToTrendPage(ctx *gin.Context)
+	GetTrends(ctx *gin.Context)
 }
 
 func ProviderITrendsCtrl(trendSrv service.ITrendSrv, messageSrv service.IMessageSrv, cfg config.IConfigEnv) ITrendCtrl {
@@ -91,4 +93,42 @@ func (ctrl *trendCtrl) RedirectToTrendPage(ctx *gin.Context) {
 	}
 
 	ctx.Redirect(http.StatusFound, matchedTrend.ShareUrl)
+}
+
+func (ctrl *trendCtrl) GetTrends(ctx *gin.Context) {
+	req := &dto.TrendCond{}
+
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctrl.SetResponse.SetStandardResponse(ctx, http.StatusBadRequest, errs.CommonErr.RequestParamError)
+		return
+	}
+
+	poTrendCond := &po.TrendCond{
+		Title:     req.Title,
+		StartDate: req.StartDate,
+		EndDate:   req.EndDate,
+	}
+
+	poPager := &po.Pager{
+		Index: req.PageIndex,
+		Size:  req.PageSize,
+	}
+
+	trends, trendsPager, err := ctrl.trendSrv.GetTrends(ctx, poTrendCond, poPager)
+
+	resp := dto.ListRes{
+		List: trends,
+		Pager: dto.PagerResp{
+			Index: trendsPager.Index,
+			Size:  trendsPager.Size,
+			Pages: trendsPager.Pages,
+			Total: trendsPager.Total,
+		},
+	}
+	if err != nil {
+		ctrl.SetResponse.SetStandardResponse(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	ctrl.SetResponse.SetStandardResponse(ctx, http.StatusOK, resp)
 }

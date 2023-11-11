@@ -20,6 +20,7 @@ type ITrendSrv interface {
 	FetchTrends(ctx context.Context) ([]*po.Trend, error)
 	UpsertTrends(ctx context.Context, data []*po.Trend) ([]*po.Trend, error)
 	GetTrendByUrl(ctx context.Context, url string) (*po.Trend, error)
+	GetTrends(ctx context.Context, cond *po.TrendCond, pager *po.Pager) ([]*po.Trend, *po.PagerResult, error)
 }
 
 func ProviderITrendsSrv(logger logger.ILogger, db mongo.IMongoCli, repo repository.ITrendRepository, config config.IConfigEnv) ITrendSrv {
@@ -88,6 +89,21 @@ func (srv *trendSrv) FetchTrends(ctx context.Context) ([]*po.Trend, error) {
 	}
 
 	return poTrends, nil
+}
+
+func (srv *trendSrv) GetTrends(ctx context.Context, cond *po.TrendCond, pager *po.Pager) ([]*po.Trend, *po.PagerResult, error) {
+	db := srv.db.GetCollection(ctx, "trends")
+	poTrends, err := srv.repo.GetTrends(ctx, db, cond, pager)
+	if err != nil {
+		return nil, nil, xerrors.Errorf("trendsSrv GetTrends repo.GetTrends error: %w", err)
+	}
+
+	poPager, err := srv.repo.GetTrendPager(ctx, db, cond, pager)
+	if err != nil {
+		return nil, nil, xerrors.Errorf("trendsSrv GetTrends repo.GetTrendPager error: %w", err)
+	}
+
+	return poTrends, poPager, nil
 }
 
 func (srv *trendSrv) UpsertTrends(ctx context.Context, data []*po.Trend) ([]*po.Trend, error) {

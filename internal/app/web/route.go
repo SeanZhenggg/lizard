@@ -15,6 +15,7 @@ func (app *webApp) setApiRoutes(g *gin.Engine) {
 
 	apiGroup := g.Group("/api")
 	apiGroup.Use(app.RespMw.Handle)
+	apiGroup.GET("trends", app.Ctrl.TrendCtrl.GetTrends)
 	apiGroup.POST("trend/push-msg", app.Ctrl.TrendCtrl.FetchTrendsAndPushMessage)
 
 }

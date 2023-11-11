@@ -32,6 +32,12 @@ type TrendUrlCond struct {
 	ShortUrl string `bson:"short_url"`
 }
 
+type TrendCond struct {
+	Title     string
+	StartDate time.Time
+	EndDate   time.Time
+}
+
 func (t *Trend) GenUID() string {
 	return fmt.Sprintf("%s_%s_%s", t.Date, t.Title, t.ShareUrl)
 }

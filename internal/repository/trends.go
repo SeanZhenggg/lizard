@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,6 +19,8 @@ type ITrendRepository interface {
 	BatchInsert(ctx context.Context, db *mongo.Collection, data []*po.Trend) error
 	BatchUpdate(ctx context.Context, db *mongo.Collection, data []*po.Trend, inDbMap map[string]*po.Trend) error
 	GetTrendByUrl(ctx context.Context, db *mongo.Collection, cond *po.TrendUrlCond) (*po.Trend, error)
+	GetTrends(ctx context.Context, db *mongo.Collection, cond *po.TrendCond, pager *po.Pager) ([]*po.Trend, error)
+	GetTrendPager(ctx context.Context, db *mongo.Collection, cond *po.TrendCond, pager *po.Pager) (*po.PagerResult, error)
 }
 
 func ProvideTrendRepository() ITrendRepository {
@@ -123,4 +126,80 @@ func (repo *trendRepo) GetTrendByUrl(ctx context.Context, db *mongo.Collection, 
 	}
 
 	return res, nil
+}
+
+func (repo *trendRepo) GetTrends(ctx context.Context, db *mongo.Collection, cond *po.TrendCond, pager *po.Pager) ([]*po.Trend, error) {
+	filters, findOpts := repo.genTrendCond(cond, pager)
+
+	result, err := db.Find(ctx, filters, findOpts)
+	defer result.Close(ctx)
+	if err != nil {
+		return nil, xerrors.Errorf("trendRepo GetTrends db.Find error : %w", err)
+	}
+
+	var res []*po.Trend
+	if err = result.All(ctx, &res); err != nil {
+		return nil, xerrors.Errorf("trendRepo GetTrends db.Find.All error : %w", err)
+	}
+
+	return res, nil
+}
+
+func (repo *trendRepo) GetTrendPager(ctx context.Context, db *mongo.Collection, cond *po.TrendCond, pager *po.Pager) (*po.PagerResult, error) {
+	filters, _ := repo.genTrendCond(cond, pager)
+	count, err := db.CountDocuments(ctx, filters)
+	if err != nil {
+		return nil, xerrors.Errorf("trendRepo GetTrends db.CountDocuments error : %w", err)
+	}
+
+	return po.NewPagerResult(pager, count), nil
+}
+
+func (repo *trendRepo) genTrendCond(cond *po.TrendCond, pager *po.Pager) (bson.M, *options.FindOptions) {
+	filters := bson.M{}
+	findOpts := options.Find()
+
+	if cond.Title != "" {
+		filters["title"] = bson.M{"$regex": fmt.Sprintf(`.*%s.*`, cond.Title)}
+	}
+
+	if !cond.StartDate.IsZero() || !cond.EndDate.IsZero() {
+		if !cond.StartDate.IsZero() && !cond.EndDate.IsZero() {
+			filters["$expr"] = bson.M{
+				"$and": bson.A{
+					bson.M{
+						"$gte": bson.A{
+							bson.M{"$dateFromString": bson.M{"dateString": "$date", "format": "%Y%m%d"}},
+							cond.StartDate,
+						},
+					},
+					bson.M{
+						"$lt": bson.A{
+							bson.M{"$dateFromString": bson.M{"dateString": "$date", "format": "%Y%m%d"}},
+							cond.EndDate,
+						},
+					},
+				},
+			}
+		} else if !cond.StartDate.IsZero() {
+			filters["$expr"] = bson.M{
+				"$gte": bson.A{
+					bson.M{"$dateFromString": bson.M{"dateString": "$date", "format": "%Y%m%d"}},
+					cond.StartDate,
+				},
+			}
+		} else if !cond.EndDate.IsZero() {
+			filters["$expr"] = bson.M{
+				"$lt": bson.A{
+					bson.M{"$dateFromString": bson.M{"dateString": "$date", "format": "%Y%m%d"}},
+					cond.EndDate,
+				},
+			}
+		}
+	}
+
+	findOpts.SetSkip(pager.GetOffset())
+	findOpts.SetLimit(pager.GetSize())
+
+	return filters, findOpts
 }
